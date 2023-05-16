@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 // import 'package:artify/main.dart';
-import 'package:artify/screens/home-page.dart';
-import 'package:artify/screens/search-page.dart';
-import 'package:artify/screens/login-page.dart';
+import 'package:artify/screens/home_page.dart';
+import 'package:artify/screens/search_page.dart';
+import 'package:artify/screens/login_page.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
