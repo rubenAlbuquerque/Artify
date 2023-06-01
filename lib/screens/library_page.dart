@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-// MySearchPage
-
-class MySearchPage extends StatelessWidget {
-  const MySearchPage({
+class MyLibraryPage extends StatelessWidget {
+  const MyLibraryPage({
     Key? key,
     // required this.data
   }) : super(key: key);
@@ -14,7 +12,7 @@ class MySearchPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Second Page'),
+        title: const Text('MyLibraryPage Page'),
       ),
       body: Center(
         child: Column(
