@@ -69,6 +69,7 @@ laucher icon
 
 */
 
+import 'package:artify/screens/search_page.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -610,9 +611,49 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => _SearchState();
 }
 
+class Album {
+  final String name;
+  final String imageUrl;
+
+  Album({required this.name, required this.imageUrl});
+}
+
 class _SearchState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  List<String> results = [];
+
+  List<Album> albums = [
+    Album(
+      name: "Album 1",
+      imageUrl: "assets/images/3.jpg",
+    ),
+    Album(
+      name: "Album 2",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "Album 3",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    // Adicione mais álbuns conforme necessário
+  ];
+
+  void search() {
+    String searchTerm = _searchController.text;
+    // print searchTerm
+    print(searchTerm);
+    // Faça aqui a lógica de pesquisa com base no searchTerm e atualize a lista de resultados
+    // Neste exemplo, vamos apenas filtrar uma lista de itens
+    // List<String> filteredList = albums
+    //     .where((album) =>
+    //         album.name.toLowerCase().contains(searchTerm.toLowerCase()))
+    //     .toList();
+
+    setState(() {
+      // results = filteredList;
+    });
+  }
 
   late Timer timer;
   bool mounted = true;
@@ -628,60 +669,121 @@ class _SearchState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 80,
-        automaticallyImplyLeading: false, // Remover botão de retorno
+        toolbarHeight: 120,
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
-        // Color.fromARGB(244, 201, 15, 15), // Remover o background azul
-        elevation: 0, // Remover a sombra
-        title: const Padding(
-          // padding: EdgeInsets.symmetric(horizontal: 2, vertical: 50),
-          padding: EdgeInsets.only(top: 20, bottom: 0),
-
-          // Adicionar padding horizontal
-          child: TextField(
-            // controller: _searchController,
-            // focusNode: _searchFocusNode,
-            keyboardType: TextInputType.text,
-            textInputAction: TextInputAction.done, //.search,
-
-            decoration: InputDecoration(
-              hintText: 'Search..',
-              hintStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                // fontWeight: FontWeight.bold
-              ),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black),
-              ),
-              contentPadding:
-                  EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-              prefixIcon: Icon(
-                Icons.search,
-                color: Colors.black,
-                size: 36,
-              ),
-            ),
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        child: Container(
-          color: Colors.grey[400],
-          // padding: const EdgeInsets.symmetric(horizontal: 14),
+        elevation: 0,
+        titleSpacing: 0.0,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 5, bottom: 0, right: 0, left: 0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                margin: const EdgeInsets.only(
+                    top: 4, bottom: 4, left: 15, right: 15),
+                child: ElevatedButton(
+                  // onPressed: () {
+                  //   // Ação quando o botão for pressionado
+                  //   showSearch(
+                  //     context: context,
+                  //     delegate: MySearchDelegate(), //CustomSearchDelegate(),
+                  //   );
+                  // },
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MySearchDelegate()),
+                    );
+                  },
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all<EdgeInsets>(
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+                    ),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.transparent),
+                    elevation: MaterialStateProperty.all<double>(0),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: const BorderSide(color: Colors.black),
+                      ),
+                    ),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.search,
+                        color: Colors.black,
+                        size: 36,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'O que queres ouvir?',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Container(
+              //   margin: const EdgeInsets.only(
+              //       top: 8, bottom: 4, left: 15, right: 15),
+              //   child: const TextField(
+              //     // controller: _searchController,
+              //     keyboardType: TextInputType.text,
+              //     textInputAction: TextInputAction.done,
+              //     // onChanged: (value) {
+              //     //   // Chama a função de pesquisa toda vez que o texto do TextField mudar
+              //     //   search();
+              //     // },
+              //     decoration: InputDecoration(
+              //       hintText: 'O que queres ouvir?',
+              //       hintStyle: TextStyle(
+              //         color: Colors.black,
+              //         fontSize: 16,
+              //       ),
+              //       border: OutlineInputBorder(
+              //         borderSide: BorderSide(color: Colors.black),
+              //       ),
+              //       focusedBorder: OutlineInputBorder(
+              //         borderSide: BorderSide(color: Colors.black),
+              //       ),
+              //       contentPadding:
+              //           EdgeInsets.symmetric(vertical: 12, horizontal: 25),
+              //       prefixIcon: Icon(
+              //         Icons.search,
+              //         color: Colors.black,
+              //         size: 36,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              // Expanded(
+              //   child: ListView.builder(
+              //     padding: EdgeInsets.zero,
+              //     itemCount: results.length,
+              //     itemBuilder: (BuildContext context, int index) {
+              //       final result = results[index];
+              //       // Construa a visualização dos resultados da pesquisa aqui
+              //       return ListTile(
+              //         title: Text(result),
+              //       );
+              //     },
+              //   ),
+              // ),
+              const SizedBox(height: 6),
               SizedBox(
                 height: 40,
                 child: ListView(
                   padding: EdgeInsets.zero,
                   scrollDirection: Axis.horizontal,
                   children: [
+                    const SizedBox(width: 15),
                     ElevatedButton(
                       onPressed: () {
                         // Ação quando o botão "Albums" é pressionado
@@ -691,15 +793,15 @@ class _SearchState extends State<SearchPage> {
                           const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 8),
                         ),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.transparent),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
                         foregroundColor:
                             MaterialStateProperty.all<Color>(Colors.black),
                         shape:
                             MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: Colors.black),
+                            side: const BorderSide(color: Colors.black),
                           ),
                         ),
                       ),
@@ -715,8 +817,8 @@ class _SearchState extends State<SearchPage> {
                           const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 8),
                         ),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.transparent),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
                         foregroundColor:
                             MaterialStateProperty.all<Color>(Colors.black),
                         shape:
@@ -736,17 +838,18 @@ class _SearchState extends State<SearchPage> {
                       },
                       style: ButtonStyle(
                         padding: MaterialStateProperty.all<EdgeInsets>(
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8),
                         ),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.transparent),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
                         foregroundColor:
                             MaterialStateProperty.all<Color>(Colors.black),
                         shape:
                             MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: Colors.black),
+                            side: const BorderSide(color: Colors.black),
                           ),
                         ),
                       ),
@@ -759,17 +862,18 @@ class _SearchState extends State<SearchPage> {
                       },
                       style: ButtonStyle(
                         padding: MaterialStateProperty.all<EdgeInsets>(
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8),
                         ),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.transparent),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
                         foregroundColor:
                             MaterialStateProperty.all<Color>(Colors.black),
                         shape:
                             MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: Colors.black),
+                            side: const BorderSide(color: Colors.black),
                           ),
                         ),
                       ),
@@ -782,17 +886,18 @@ class _SearchState extends State<SearchPage> {
                       },
                       style: ButtonStyle(
                         padding: MaterialStateProperty.all<EdgeInsets>(
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8),
                         ),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.transparent),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
                         foregroundColor:
                             MaterialStateProperty.all<Color>(Colors.black),
                         shape:
                             MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: Colors.black),
+                            side: const BorderSide(color: Colors.black),
                           ),
                         ),
                       ),
@@ -802,59 +907,229 @@ class _SearchState extends State<SearchPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 6),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 14),
-                child: Align(
-                  alignment: Alignment.centerLeft, // Alinhar à esquerda
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 0),
-                    // Adicionar padding vertical
-                    child: Text(
-                      'New Albums',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6),
-              SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  padding: EdgeInsets.zero,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 5, //albums.length,
-                  // Substitua "albums.length" pela quantidade real
-                  itemBuilder: (BuildContext context, int index) {
-                    // final album = albums[index];
-                    return Column(
-                      children: [
-                        Container(
-                          width: 150,
-                          height: 150,
-                          margin: const EdgeInsets.only(right: 16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            image: const DecorationImage(
-                              image: AssetImage('assets/images/background.jpg'),
-                              fit: BoxFit.cover,
+            ],
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        //horizontal: 10.0).copyWith(right: 0),
+        child: SingleChildScrollView(
+          child: Container(
+            // color: Colors.grey[400],
+            // padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: Align(
+                        alignment: Alignment.centerLeft, // Alinhar à esquerda
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          // Adicionar padding vertical
+                          child: Text(
+                            'New Albums',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'album.name',
-                          style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      height: 150,
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: albums.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final album = albums[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const LibraryPage()),
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 14),
+                                  child: Container(
+                                    width: 120,
+                                    height: 120,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                        image: AssetImage(album.imageUrl),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 14),
+                                  child: SizedBox(
+                                    width: 120,
+                                    child: Center(
+                                      child: Text(
+                                        album.name,
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: Align(
+                        alignment: Alignment.centerLeft, // Alinhar à esquerda
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          // Adicionar padding vertical
+                          child: Text(
+                            'New Albums',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ],
-                    );
-                  },
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      height: 150,
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 5, //albums.length,
+                        // Substitua "albums.length" pela quantidade real
+                        itemBuilder: (BuildContext context, int index) {
+                          // final album = albums[index];
+                          return Column(
+                            children: [
+                              // const SizedBox(width: 14),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 14), // .all(8.0),
+                                child: Container(
+                                  width: 120,
+                                  height: 120,
+                                  margin: const EdgeInsets.only(right: 0),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: const DecorationImage(
+                                      image: AssetImage(
+                                          'assets/images/background.jpg'),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              const Padding(
+                                padding: EdgeInsets.only(left: 14),
+                                child: SizedBox(
+                                  width: 120,
+                                  // color: Colors.red, // Background color
+                                  child: Center(
+                                    child: Text(
+                                      'album.name',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: Align(
+                        alignment: Alignment.centerLeft, // Alinhar à esquerda
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          // Adicionar padding vertical
+                          child: Text(
+                            'New Albums',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      height: 150,
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 5, //albums.length,
+                        // Substitua "albums.length" pela quantidade real
+                        itemBuilder: (BuildContext context, int index) {
+                          // final album = albums[index];
+                          return Column(
+                            children: [
+                              // const SizedBox(width: 14),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 14), // .all(8.0),
+                                child: Container(
+                                  width: 120,
+                                  height: 120,
+                                  margin: const EdgeInsets.only(right: 0),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: const DecorationImage(
+                                      image: AssetImage(
+                                          'assets/images/background.jpg'),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              const Padding(
+                                padding: EdgeInsets.only(left: 14),
+                                child: SizedBox(
+                                  width: 120,
+                                  // color: Colors.red, // Background color
+                                  child: Center(
+                                    child: Text(
+                                      'album.name',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -913,6 +1188,357 @@ class _SearchState extends State<SearchPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+// Model musci data model
+class Result {
+  final String nome; //nome, nome muscia, nome album
+  final String type; // Musica, playlsi, artista
+  final String artist;
+  final String coverImg;
+  final String duration;
+
+  Result(this.nome, this.type, this.artist, this.coverImg, this.duration);
+}
+
+// MySearchDelegate
+class MySearchDelegate extends StatefulWidget {
+  const MySearchDelegate({Key? key}) : super(key: key);
+
+  @override
+  State<MySearchDelegate> createState() => _MySearchDelegateState();
+}
+
+class _MySearchDelegateState extends State<MySearchDelegate> {
+  // Result result = Result('nome', 'type', 'artists', 'coverImg', 'duration');
+  // Result
+  static List<Result> dummyResults = [
+    Result('Nome Music 1', 'Music', 'WEb badga', 'assets/images/background.jpg',
+        '2:10min'),
+    Result('Nome Music 2', 'Music', 'Red', 'assets/images/background.jpg',
+        '3:10min'),
+    Result('Nome Music 3', 'Music', 'Green & Ruben',
+        'assets/images/background.jpg', '4:10min'),
+    Result('Nome Music 4', 'Music', 'Blue', 'assets/images/background.jpg',
+        '5:10min'),
+    Result('Ruben', 'Artist', 'Ruben', 'assets/images/background.jpg', '-'),
+    Result('rui', 'Artist', 'rui', 'assets/images/background.jpg', '-'),
+    Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+    // Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+  ];
+
+  List<Result> display_results = List.from(dummyResults);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        bottom: PreferredSize(
+          preferredSize:
+              const Size.fromHeight(1.0), // Set the height of the border
+          child: Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Color.fromARGB(
+                      255, 122, 122, 122), // Set the color of the border
+                  width: 1.0, // Set the width of the border
+                ),
+              ),
+            ),
+          ),
+        ),
+        // toolbarHeight: 120,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        titleSpacing: 0.0,
+        leading: IconButton(
+          onPressed: () {
+            // showSearch(context: context, delegate: CustomSearchDelegate());
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            // backgroundColor: Colors.red,
+          ),
+        ),
+        title: const TextField(
+          autofocus: true,
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+            // remove the underline
+
+            decoration: TextDecoration.none,
+            fontWeight: FontWeight.bold,
+          ),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+            // filled: true,
+            // fillColor: Color.fromARGB(255, 187, 22, 22),
+            // border: InputBorder.none,
+            hintText: 'O que queres ouvir?',
+            hintStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              // bold
+              fontWeight: FontWeight.bold,
+            ),
+            // border: InputBorder.none,
+            // prefixIcon: Icon(Icons.arrow_back, color: Colors.black),
+            // prefixIconConstraints: BoxConstraints(
+            //   minWidth: 50,
+            //   minHeight: 50,
+            // ),
+            // border: OutlineInputBorder(
+            //   borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            //   borderSide: BorderSide.none,
+            //   // borderSide: BorderSide(
+            //   //   color: Color.fromARGB(0, 16, 16, 16),
+            //   //   width: 1,
+            //   // ),
+            // ),
+            // suffixIcon: IconButton(
+            //   onPressed: () {
+            //     // showSearch(context: context, delegate: CustomSearchDelegate());
+            //   },
+            //   icon: const Icon(Icons.clear, color: Colors.black),
+            // ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // showSearch(context: context, delegate: CustomSearchDelegate());
+            },
+            icon: const Icon(Icons.clear, color: Colors.black),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 20.0,
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: display_results.length,
+              itemBuilder: (context, index) => ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                title: Text(display_results[index].nome,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    )),
+                subtitle: Text(
+                    '${display_results[index].nome} : ${display_results[index].artist}',
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    )),
+                trailing: Text("${display_results[index].duration}",
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    )),
+                leading: Image(
+                  image: AssetImage(
+                      "${display_results[index].coverImg}"), // For asset images
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+// @override
+// Widget build(BuildContext context) {
+//   return Scaffold(
+//     appBar: AppBar(
+//       // toolbarHeight: 120,
+//       automaticallyImplyLeading: false,
+//       backgroundColor: Colors.transparent,
+//       elevation: 0,
+//       // titleSpacing: 0.0,
+//       leading: IconButton(
+//         onPressed: () {
+//           // showSearch(context: context, delegate: CustomSearchDelegate());
+//           Navigator.pop(context);
+//         },
+//         icon: const Icon(Icons.arrow_back, color: Colors.black),
+//       ),
+//       title: const Text(
+//         'O que queres ouvir ?',
+//         style: TextStyle(
+//           fontSize: 16,
+//           fontWeight: FontWeight.bold,
+//           color: Colors.black,
+//         ),
+//       ),
+//       actions: [
+//         IconButton(
+//           onPressed: () {
+//             // showSearch(context: context, delegate: CustomSearchDelegate());
+//           },
+//           icon: const Icon(Icons.clear, color: Colors.black),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
+// CustomSearchDelegate
+class CustomSearchDelegate extends SearchDelegate {
+  List<String> searchTerms = [
+    'Aearch term 1',
+    'Aearch term 2',
+    'Aearch term 3',
+    'Bearch term 4',
+    'Bearch term 5',
+    'Bearch term 6',
+    'Bearch term 7',
+    'Search term 8',
+    'Search term 9',
+    'Search term 10',
+    'Search term 11',
+    'Search term 12',
+    'Search term 13',
+    'Search term 14',
+    'Search term 15',
+    'Search term 16',
+    'Search term 17',
+    'Search term 18',
+    'Search term 19',
+    'Search term 20',
+    'Search term 21',
+  ];
+
+  // @override
+  // AppBar buildAppBar(BuildContext context) {
+  //   return AppBar(
+  //     backgroundColor: Colors.black, // Altera a cor de fundo para preto
+  //     elevation: 0, // Remove a sombra da AppBar
+  //     // Adicione outras propriedades personalizadas desejadas para a AppBar
+  //     // ...
+  //     actions: buildActions(context),
+  //     leading: buildLeading(context),
+  //     // title: buildSearchField(context),
+  //   );
+  // }
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        onPressed: () {
+          query = '';
+        },
+        icon: const Icon(Icons.clear, color: Colors.black),
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        Navigator.pop(context);
+        // close(context, null);
+      },
+      // icon: const Icon(Icons.arrow_back),
+      icon: const Icon(
+        Icons.arrow_back_ios,
+        color: Colors.black,
+      ),
+    );
+  }
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    return ThemeData(
+      appBarTheme: const AppBarTheme(
+        elevation: 0, // Remove a sombra da AppBar
+        color: Color.fromARGB(
+            0, 178, 178, 178), // Define a cor da AppBar como transparente
+        // brightness: Brightness.dark, // Define o brilho da AppBar como escuro
+        // Adicione outras propriedades personalizadas desejadas para a AppBar
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        border: InputBorder.none, // Remove a borda do TextField
+      ),
+      textTheme: ThemeData.dark().textTheme.copyWith(
+            headline6: const TextStyle(
+              fontSize: 20, // Define o tamanho da fonte do título
+              fontWeight: FontWeight.bold, // Define o peso da fonte do título
+              color: Color.fromARGB(255, 226, 11, 11), // Define a cor do título
+              decoration: TextDecoration.none, // Remove o sublinhado do texto
+            ),
+          ),
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Container(
+      color: Colors.red,
+      child: Center(
+        child: Text(query),
+        // Utilizar a quary para redirecionar user
+        // + ' ' + context.toString()
+      ),
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final List<String> suggestionList = query.isEmpty
+        ? searchTerms
+        : searchTerms
+            .where((element) =>
+                element.toLowerCase().startsWith(query.toLowerCase()))
+            .toList();
+
+    return ListView.builder(
+      itemCount: suggestionList.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          onTap: () {
+            query = suggestionList[index];
+            showResults(context);
+          },
+          // cada resultado???
+          leading: const Icon(Icons.search),
+          title: RichText(
+            text: TextSpan(
+              text: suggestionList[index].substring(0, query.length),
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+              children: [
+                TextSpan(
+                  text: suggestionList[index].substring(query.length),
+                  style: const TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
