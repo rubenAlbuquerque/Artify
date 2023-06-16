@@ -835,17 +835,17 @@ class _SearchState extends State<SearchPage> {
                         Container(
                           width: 150,
                           height: 150,
-                          margin: EdgeInsets.only(right: 16),
+                          margin: const EdgeInsets.only(right: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
-                            image: DecorationImage(
+                            image: const DecorationImage(
                               image: AssetImage('assets/images/background.jpg'),
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
-                        SizedBox(height: 8),
-                        Text(
+                        const SizedBox(height: 8),
+                        const Text(
                           'album.name',
                           style: TextStyle(fontSize: 16),
                         ),
