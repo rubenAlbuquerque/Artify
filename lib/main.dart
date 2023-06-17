@@ -69,11 +69,22 @@ laucher icon
 
 */
 
-import 'package:artify/screens/search_page.dart';
+// import 'package:artify/screens/search_page.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 // import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'dart:async';
+
+// import 'package:audioplayers/audio_cache.dart';
+// import 'package:flutter_audio_cache/flutter_audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_icons/flutter_icons.dart';
+// import 'package:spotify_clone/theme/colors.dart';
+
+// import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(const MyApp());
@@ -940,7 +951,7 @@ class _SearchState extends State<SearchPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     SizedBox(
                       height: 150,
                       child: ListView.builder(
@@ -951,10 +962,25 @@ class _SearchState extends State<SearchPage> {
                           final album = albums[index];
                           return GestureDetector(
                             onTap: () {
+                              // Navegar para a página do reprodutor de música
+                              print(
+                                  'Tocando ${album.name}, do ${album.imageUrl}');
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const LibraryPage()),
+                                  builder: (context) => MusicDetailPage(
+                                    title: album.name,
+                                    description: "album.description",
+                                    color: Colors.black,
+                                    img: album.imageUrl,
+                                    songUrl: "album.songUrl",
+                                    // final String title;
+                                    // final String description;
+                                    // final Color color;
+                                    // final String img;
+                                    // final String songUrl;
+                                  ),
+                                ),
                               );
                             },
                             child: Column(
@@ -973,7 +999,7 @@ class _SearchState extends State<SearchPage> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 14),
                                   child: SizedBox(
@@ -993,139 +1019,6 @@ class _SearchState extends State<SearchPage> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 14),
-                      child: Align(
-                        alignment: Alignment.centerLeft, // Alinhar à esquerda
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5),
-                          // Adicionar padding vertical
-                          child: Text(
-                            'New Albums',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      height: 150,
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 5, //albums.length,
-                        // Substitua "albums.length" pela quantidade real
-                        itemBuilder: (BuildContext context, int index) {
-                          // final album = albums[index];
-                          return Column(
-                            children: [
-                              // const SizedBox(width: 14),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 14), // .all(8.0),
-                                child: Container(
-                                  width: 120,
-                                  height: 120,
-                                  margin: const EdgeInsets.only(right: 0),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: const DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/background.jpg'),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 14),
-                                child: SizedBox(
-                                  width: 120,
-                                  // color: Colors.red, // Background color
-                                  child: Center(
-                                    child: Text(
-                                      'album.name',
-                                      style: TextStyle(fontSize: 14),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 14),
-                      child: Align(
-                        alignment: Alignment.centerLeft, // Alinhar à esquerda
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5),
-                          // Adicionar padding vertical
-                          child: Text(
-                            'New Albums',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      height: 150,
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 5, //albums.length,
-                        // Substitua "albums.length" pela quantidade real
-                        itemBuilder: (BuildContext context, int index) {
-                          // final album = albums[index];
-                          return Column(
-                            children: [
-                              // const SizedBox(width: 14),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 14), // .all(8.0),
-                                child: Container(
-                                  width: 120,
-                                  height: 120,
-                                  margin: const EdgeInsets.only(right: 0),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: const DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/background.jpg'),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 14),
-                                child: SizedBox(
-                                  width: 120,
-                                  // color: Colors.red, // Background color
-                                  child: Center(
-                                    child: Text(
-                                      'album.name',
-                                      style: TextStyle(fontSize: 14),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
                   ],
                 ),
               ],
@@ -1215,6 +1108,11 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
   // Result result = Result('nome', 'type', 'artists', 'coverImg', 'duration');
   // Result
   static List<Result> dummyResults = [
+    Result('Ruben', 'Artist', 'Ruben', 'assets/images/background.jpg', '-'),
+    Result('rui', 'Artist', 'rui', 'assets/images/background.jpg', '-'),
+    Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+    Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+    Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
     Result('Nome Music 1', 'Music', 'WEb badga', 'assets/images/background.jpg',
         '2:10min'),
     Result('Nome Music 2', 'Music', 'Red', 'assets/images/background.jpg',
@@ -1228,8 +1126,24 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
     Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
     // Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
   ];
+  // https://www.youtube.com/watch?v=jFHSkfjN96I
 
-  List<Result> display_results = List.from(dummyResults);
+  List<Result> display_results = [];
+
+  void updateList(String value) {
+    setState(() {
+      display_results = dummyResults
+          .where((element) =>
+              element.nome.toLowerCase().contains(value.toLowerCase()))
+          .toList();
+    });
+  }
+
+  void clearList() {
+    setState(() {
+      display_results = List.from(dummyResults);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1266,9 +1180,10 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
             // backgroundColor: Colors.red,
           ),
         ),
-        title: const TextField(
+        title: TextField(
+          onChanged: (value) => updateList(value),
           autofocus: true,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 16,
             // remove the underline
@@ -1276,7 +1191,7 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
             decoration: TextDecoration.none,
             fontWeight: FontWeight.bold,
           ),
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             border: InputBorder.none,
             focusedBorder: InputBorder.none,
             enabledBorder: InputBorder.none,
@@ -1318,6 +1233,8 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
           IconButton(
             onPressed: () {
               // showSearch(context: context, delegate: CustomSearchDelegate());
+              // clear the search
+              clearList();
             },
             icon: const Icon(Icons.clear, color: Colors.black),
           ),
@@ -1326,38 +1243,433 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
       body: Column(
         children: [
           const SizedBox(
-            height: 20.0,
+            height: 5.0,
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: display_results.length,
-              itemBuilder: (context, index) => ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                title: Text(display_results[index].nome,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    )),
-                subtitle: Text(
-                    '${display_results[index].nome} : ${display_results[index].artist}',
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
-                    )),
-                trailing: Text("${display_results[index].duration}",
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
-                    )),
-                leading: Image(
-                  image: AssetImage(
-                      "${display_results[index].coverImg}"), // For asset images
+            child: display_results.length == 0
+                ? const Center(
+                    child: Text('No results Found',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          // backgroundColor: Colors.red,
+                          // print('No results Found'),
+                        )),
+                  )
+                : ListView.builder(
+                    itemCount: display_results.length,
+                    itemBuilder: (context, index) => ListTile(
+                      // backgroundColor: Colors.black,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 0.0),
+                      onTap: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => MusicPlayer(),
+                        //   ),
+                        // );
+                      },
+                      title: Text(display_results[index].nome,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          )),
+                      subtitle: Text(
+                          '${display_results[index].nome} : ${display_results[index].artist}',
+                          style: const TextStyle(
+                            color: Colors.black87,
+                            // backgroundColor: Colors.black,
+                            // fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          )),
+                      // trailing: Text(display_results[index].duration,
+                      // style: const TextStyle(
+                      // color: Colors.black87,
+                      // fontWeight: FontWeight.bold,
+                      //  )),
+                      leading: Image(
+                        image: AssetImage(display_results[index].coverImg),
+                        // image: AssetImage('assets/icons/google.png'),
+                        fit: BoxFit.cover,
+                        height: 60,
+                        width: 60,
+                        // color: Colors.black,
+                        // colorBlendMode: BlendMode.darken,
+
+                        // For asset images
+                      ),
+                    ),
+                  ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class MusicDetailPage extends StatefulWidget {
+  final String title;
+  final String description;
+  final Color color;
+  final String img;
+  final String songUrl;
+  // detalhes da musica?? tempo, nome, artista, etc
+
+  const MusicDetailPage(
+      {Key? key,
+      required this.title,
+      required this.description,
+      required this.color,
+      required this.img,
+      required this.songUrl})
+      : super(key: key);
+
+  @override
+  _MusicDetailPageState createState() => _MusicDetailPageState();
+}
+
+class _MusicDetailPageState extends State<MusicDetailPage> {
+  // bool isPlaying = false;
+  bool isPressed = false;
+  // double _currentSliderValue = 0;
+
+  final player = AudioPlayer();
+  Duration? duration;
+  bool isPlaying = false;
+  double _value = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+
+    void initPlayer() async {
+      // https://www.youtube.com/watch?v=DIqB8qEZW1U
+      await player.setSource(AssetSource("gym.mp3"));
+      // await player.setAudioSource(AssetAudioSource(asset: 'audio/gym.mp3'));
+      duration = await player.getDuration();
+    }
+
+    @override
+    void initState() {
+      super.initState();
+      initPlayer();
+    }
+
+    String formatDuration(Duration duration) {
+      String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+      String minutes = twoDigits(duration.inMinutes.remainder(60));
+      String seconds = twoDigits(duration.inSeconds.remainder(60));
+
+      if (duration.inHours > 0) {
+        return '${twoDigits(duration.inHours)}:$minutes:$seconds';
+      } else {
+        return '$minutes:$seconds';
+      }
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        titleSpacing: 0.0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 30, right: 30, top: 20),
+                  child: Container(
+                    width: size.width - 100,
+                    height: size.width - 100,
+                    decoration: BoxDecoration(boxShadow: [
+                      BoxShadow(
+                          color: widget.color,
+                          blurRadius: 100,
+                          spreadRadius: 10,
+                          offset: const Offset(20, 20))
+                    ], borderRadius: BorderRadius.circular(20)),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 10, top: 0),
+                  child: Container(
+                    width: size.width - 5,
+                    height: size.width - 0,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage(widget.img), fit: BoxFit.cover),
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                )
+              ],
+            ),
+
+            Container(
+              alignment: Alignment.center,
+              // color: Colors.blueGrey,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 0, right: 0),
+                child: Container(
+                  alignment: Alignment.center,
+                  // color: Colors.blueGrey,
+                  child: SizedBox(
+                    width: size.width - 20,
+                    // height: 55,
+                    // color: Colors.blueGrey,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // const Icon(
+                        //   Icons.folder,
+                        //   color: Colors.black,
+                        // ),
+                        // nome do artista e da msuica
+                        Padding(
+                          // padding: const EdgeInsets.only( left: 10, right: 10, top: 10, bottom: 0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 0),
+                          child: Column(
+                            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                // color: Colors.amber,
+                                child: const SizedBox(
+                                  width: 150,
+                                  child: Text(
+                                    "StarBoy",
+                                    // widget.title,
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                // color: Colors.teal,
+                                child: SizedBox(
+                                  width: 150,
+                                  child: Text(
+                                    "Wizkid",
+                                    // widget.description,
+                                    maxLines: 1,
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black.withOpacity(0.5),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Like
+                        Material(
+                          // color: Colors.blue,
+                          // child: Ink( shuffle, skip_back, controller_stop e play skip_forward e retweet
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  left:
+                                      0), // Adjust the padding values as needed
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isPressed = !isPressed;
+                                    // print(isPressed);
+                                  });
+                                },
+                                iconSize: 45,
+                                icon: Icon(
+                                  isPressed
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: isPressed ? Colors.red : Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                          // ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          )
-        ],
+
+            StatefulBuilder(builder: (context, state) {
+              return Column(
+                children: [
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      trackHeight:
+                          2, // Defina a espessura desejada para o slider
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 6, // Tamanho do círculo
+                      ),
+                    ),
+                    child: Slider(
+                      activeColor: Colors.black,
+                      value: _value.toDouble(),
+                      min: 0,
+                      max: 100,
+                      onChanged: (double value) {
+                        state(() {
+                          _value = value;
+                        });
+                      },
+                    ),
+                  ),
+                  Container(
+                    // color: Colors.teal, // Substitua pela cor desejada
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            formatDuration(Duration(seconds: _value.toInt())),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black.withOpacity(0.5),
+                            ),
+                          ),
+                          Text(
+                            '3:45', // Substitua pelo tempo total da música
+                            //  "${duration!.inMinutes} : ${duration!.inSeconds % 60}",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    // color: Colors.teal, // Substitua pela cor desejada
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            // Lógica para lidar com o botão de embaralhar
+                          },
+                          icon: const Icon(size: 30, Icons.shuffle),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // Lógica para lidar com o botão de voltar
+                          },
+                          icon: const Icon(size: 30, Icons.skip_previous),
+                        ),
+                        IconButton(
+                          iconSize: 70,
+                          icon: Container(
+                            decoration: BoxDecoration(
+                              // shape: BoxShape.circle,
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                isPlaying ? Icons.pause : Icons.play_arrow,
+                                size: 50,
+                                // Icons.pause,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          onPressed: () async {
+                            if (isPlaying) {
+                              await player.pause();
+                            } else {
+                              // await player.play();
+                              await player.onPositionChanged
+                                  .listen((Duration d) {
+                                setState(() {
+                                  _value = d.inSeconds.toDouble();
+                                  print(_value);
+                                });
+                              });
+                            }
+                            setState(() {
+                              isPlaying = !isPlaying;
+                            });
+                          },
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // Lógica para lidar com o botão de avançar
+                          },
+                          icon: const Icon(size: 30, Icons.skip_next),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // Lógica para lidar com o botão de retweet
+                          },
+                          icon: const Icon(size: 30, Icons.repeat),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+            const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(
+                //arro down
+                Icons.arrow_downward,
+                color: Colors.black,
+                size: 30,
+              ),
+              Text(
+                "Swipe down to minimize",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+              ),
+            ])
+
+            // Text(widget.title,
+            //     style: const TextStyle(
+            //       color: Colors.black,
+            //       fontWeight: FontWeight.bold,
+            //       fontSize: 22,
+            //     )),
+            // Text(widget.title),
+            // const SizedBox(height: 20),
+            // Text(widget.description),
+            // const SizedBox(height: 20),
+            // Text(widget.songUrl),
+            // const SizedBox(height: 20),
+            // Text(widget.color.toString()),
+          ],
+        ),
       ),
     );
   }
@@ -1539,6 +1851,62 @@ class CustomSearchDelegate extends SearchDelegate {
           ),
         );
       },
+    );
+  }
+}
+
+class MusicPlayerPage extends StatelessWidget {
+  final String musicTitle;
+  final String musicCoverImage;
+
+  const MusicPlayerPage({
+    Key? key,
+    required this.musicTitle,
+    required this.musicCoverImage,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        titleSpacing: 0.0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        //   title: Text(musicTitle,
+        //       style: const TextStyle(
+        //         color: Colors.black,
+        //         fontWeight: FontWeight.bold,
+        //         backgroundColor: Colors.red,
+        //       )),
+      ),
+      body: Column(
+        // mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Image.network(musicCoverImage),
+          Image(
+            image: AssetImage(musicCoverImage),
+            // image: AssetImage('assets/icons/google.png'),
+            fit: BoxFit.cover,
+            height: 250,
+            width: 250,
+            // color: Colors.black,
+            // colorBlendMode: BlendMode.darken,
+
+            // For asset images
+          ),
+          const SizedBox(height: 20),
+          // const Text('${musicTitle}]'),
+
+          // Add music player controls here (e.g., play/pause buttons, seek bar, etc.)
+        ],
+      ),
     );
   }
 }
