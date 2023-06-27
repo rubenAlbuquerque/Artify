@@ -71,8 +71,8 @@ laucher icon
 
 // import 'package:artify/screens/search_page.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:flutter/cupertino.dart';
+// import 'dart:io';
+// import 'package:flutter/cupertino.dart';
 // import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'dart:async';
@@ -261,7 +261,7 @@ class _HomeState extends State<HomePage> {
   late List<Story> stories;
   late List<Post> posts; // Adicione a declaração da lista de posts
   late Timer timer;
-  bool mounted = true;
+  // bool mounted = true;
 
   List<Story> generateStories(int count) {
     List<Story> stories = [];
@@ -651,9 +651,9 @@ class _SearchState extends State<SearchPage> {
   ];
 
   void search() {
-    String searchTerm = _searchController.text;
+    // String searchTerm = _searchController.text;
     // print searchTerm
-    print(searchTerm);
+    // print(searchTerm);
     // Faça aqui a lógica de pesquisa com base no searchTerm e atualize a lista de resultados
     // Neste exemplo, vamos apenas filtrar uma lista de itens
     // List<String> filteredList = albums
@@ -667,7 +667,7 @@ class _SearchState extends State<SearchPage> {
   }
 
   late Timer timer;
-  bool mounted = true;
+  // bool mounted = true;
 
   @override
   void dispose() {
@@ -926,110 +926,106 @@ class _SearchState extends State<SearchPage> {
         padding: const EdgeInsets.symmetric(horizontal: 0),
         //horizontal: 10.0).copyWith(right: 0),
         child: SingleChildScrollView(
-          child: Container(
-            // color: Colors.grey[400],
-            // padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 14),
-                      child: Align(
-                        alignment: Alignment.centerLeft, // Alinhar à esquerda
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5),
-                          // Adicionar padding vertical
-                          child: Text(
-                            'New Albums',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 14),
+                    child: Align(
+                      alignment: Alignment.centerLeft, // Alinhar à esquerda
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        // Adicionar padding vertical
+                        child: Text(
+                          'New Albums',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 150,
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: albums.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final album = albums[index];
-                          return GestureDetector(
-                            onTap: () {
-                              // Navegar para a página do reprodutor de música
-                              print(
-                                  'Tocando ${album.name}, do ${album.imageUrl}');
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MusicDetailPage(
-                                    title: album.name,
-                                    description: "album.description",
-                                    color: Colors.black,
-                                    img: album.imageUrl,
-                                    songUrl: "album.songUrl",
-                                    // final String title;
-                                    // final String description;
-                                    // final Color color;
-                                    // final String img;
-                                    // final String songUrl;
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 14),
-                                  child: Container(
-                                    width: 120,
-                                    height: 120,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      image: DecorationImage(
-                                        image: AssetImage(album.imageUrl),
-                                        fit: BoxFit.cover,
-                                      ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 150,
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: albums.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final album = albums[index];
+                        return GestureDetector(
+                          onTap: () {
+                            // Navegar para a página do reprodutor de música
+                            // print( 'Tocando ${album.name}, do ${album.imageUrl}');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AudioPlayerSreen(),
+                                // MusicDetailPage(
+                                //   title: album.name,
+                                //   description: "album.description",
+                                //   color: Colors.black,
+                                //   img: album.imageUrl,
+                                //   songUrl: "album.songUrl",
+                                // final String title;
+                                // final String description;
+                                // final Color color;
+                                // final String img;
+                                // final String songUrl;
+                                // ),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 14),
+                                child: Container(
+                                  width: 120,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: DecorationImage(
+                                      image: AssetImage(album.imageUrl),
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 14),
-                                  child: SizedBox(
-                                    width: 120,
-                                    child: Center(
-                                      child: Text(
-                                        album.name,
-                                        style: TextStyle(fontSize: 14),
-                                      ),
+                              ),
+                              const SizedBox(height: 4),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 14),
+                                child: SizedBox(
+                                  width: 120,
+                                  child: Center(
+                                    child: Text(
+                                      album.name,
+                                      style: const TextStyle(fontSize: 14),
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                    const SizedBox(height: 6),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                  const SizedBox(height: 6),
+                ],
+              ),
+            ],
           ),
         ),
       ),
       bottomNavigationBar: Container(
         color: const Color.fromARGB(75, 70, 70, 70),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: GNav(
             // backgroundColor: Color.fromARGB(0, 136, 136, 136),
             // rippleColor: Color.fromARGB(255, 226, 0, 0),
@@ -1310,6 +1306,85 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
   }
 }
 
+// import 'package:audio_library/audio_library.dart';
+
+class AudioPlayerSreen extends StatefulWidget {
+  const AudioPlayerSreen({Key? key}) : super(key: key);
+
+  @override
+  _AudioPlayerSreenState createState() => _AudioPlayerSreenState();
+}
+
+class _AudioPlayerSreenState extends State<AudioPlayerSreen> {
+  late AudioPlayer _audioPlayer;
+
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer = AudioPlayer()..setSourceAsset('assets/gym.mp3');
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(213, 143, 18, 18),
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.keyboard_arrow_down_rounded,
+              color: Colors.black),
+        ),
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(20.0),
+        height: double.infinity,
+        width: double.infinity,
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color.fromARGB(63, 216, 28, 28),
+            Color.fromARGB(70, 47, 1, 231),
+          ],
+        )),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [],
+        ),
+      ),
+    );
+  }
+}
+
+// class Controls extends StatelessWidget {
+//   const Controls({
+//     Key? key,
+//     required this.audioPlayer,
+//   });
+
+//   final AudioPlayer? audioPlayer;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return StreamBuilder<PlayerState>(
+//       stream: audioPlayer?.playerStateStream,
+//       builder: (context, snapshot){
+
+//       },),
+//   }
+// }
+
+// / / / / / / / / / / / / / / / / / / / / / /
 class MusicDetailPage extends StatefulWidget {
   final String title;
   final String description;
