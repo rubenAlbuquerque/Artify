@@ -1,74 +1,3 @@
-/*
-import 'package:artify/route_generator.dart';
-import 'package:flutter/material.dart';
-// import './screens/login-page.dart';
-import './screens/home_page.dart';
-
-void main() {
-  runApp(const MyApp());
-  // build\app\outputs\flutter-apk\app-debug.apk
-}
-
-// MyHomePage
-class MyApp extends StatelessWidget {
-  // const MyApp({super.key});
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      
-      title: 'Flutter Demo',
-      theme: ThemeData(
-          // primarySwatch: Colors.amber,
-          ),
-      home: const MyHomePage(),
-      initialRoute: '/login',
-      onGenerateRoute: RouteGenerator.generateRoute,
-
-      // bottomNavigationBar: BottomNavigationBar(
-      //   // color da barra de navegação
-      //   backgroundColor: Colors.blue,
-      //   items: const <BottomNavigationBarItem>[
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.home),
-      //       label: 'Home',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.search),
-      //       label: 'Search',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.person),
-      //       label: 'Profile',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.person),
-      //       label: 'Profil',
-      //     ),
-      //   ],
-      //   // currentIndex: _selectedIndex,
-      //   selectedItemColor: Color.fromARGB(255, 255, 0, 0)     // onTap: _onItemTapped,
-      // ),
-    );
-  }
-}
-
-// fitterBox - child do tamanho do parent
-// splash screen
-silverAppBar corre com o scrooll
-Size size = MediaQuery.of(context).size
-double height = size.height
-double width = size.width
-
-selectableText
-
-iconButon -> AnimatedIcon
-laucher icon
-
-*/
-
 // import 'package:artify/screens/search_page.dart';
 import 'package:flutter/material.dart';
 // import 'dart:io';
@@ -79,7 +8,8 @@ import 'dart:async';
 
 // import 'package:audioplayers/audio_cache.dart';
 // import 'package:flutter_audio_cache/flutter_audio_cache.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 // import 'package:flutter/material.dart';
 // import 'package:flutter_icons/flutter_icons.dart';
 // import 'package:spotify_clone/theme/colors.dart';
@@ -964,19 +894,21 @@ class _SearchState extends State<SearchPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const AudioPlayerSreen(),
-                                // MusicDetailPage(
-                                //   title: album.name,
-                                //   description: "album.description",
-                                //   color: Colors.black,
-                                //   img: album.imageUrl,
-                                //   songUrl: "album.songUrl",
-                                // final String title;
-                                // final String description;
-                                // final Color color;
-                                // final String img;
-                                // final String songUrl;
-                                // ),
+                                builder: (context) =>
+                                    // MusicDetailPage(), // AudioPlayerSreen(),
+                                    MusicDetailPage(
+                                  title: album.name,
+                                  description: "album.description",
+                                  color: Colors.black,
+                                  img: album.imageUrl,
+                                  songUrl: "album.songUrl",
+                                  // final String title;
+                                  // final String description;
+                                  // final Color color;
+                                  // final String img;
+                                  // final String songUrl;
+                                  // ),
+                                ),
                               ),
                             );
                           },
@@ -1321,7 +1253,7 @@ class _AudioPlayerSreenState extends State<AudioPlayerSreen> {
   @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer()..setSourceAsset('assets/gym.mp3');
+    // _audioPlayer = AudioPlayer()..setSourceAsset('assets/gym.mp3');
   }
 
   @override
@@ -1407,31 +1339,35 @@ class MusicDetailPage extends StatefulWidget {
 }
 
 class _MusicDetailPageState extends State<MusicDetailPage> {
-  // bool isPlaying = false;
   bool isPressed = false;
-  // double _currentSliderValue = 0;
+  final AudioPlayer audioPlayer = AudioPlayer();
 
-  final player = AudioPlayer();
   Duration? duration;
-  bool isPlaying = false;
+  bool isPlaying = true;
   double _value = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    // _audioPlayer = AudioPlayer()..setSourceAsset('assets/gym.mp3');
+    audioPlayer.setAsset('assets/audio/gym.mp3');
+    audioPlayer.play();
+  }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    // audioPlayer.setAsset('assets/audio/gym.mp3');
+    // audioPlayer.play();
 
-    void initPlayer() async {
-      // https://www.youtube.com/watch?v=DIqB8qEZW1U
-      await player.setSource(AssetSource("gym.mp3"));
-      // await player.setAudioSource(AssetAudioSource(asset: 'audio/gym.mp3'));
-      duration = await player.getDuration();
-    }
-
-    @override
-    void initState() {
-      super.initState();
-      initPlayer();
-    }
+    // void initPlayer() async {
+    // https://www.youtube.com/watch?v=DIqB8qEZW1U
+    // await player.setSource(AssetSource("gym.mp3"));
+    // final AudioPlayer audioPlayer = AudioPlayer();
+    // final Duration duration = await audioPlayer.setAsset('audio/gym.mp3');
+    // await player.setAudioSource(AssetAudioSource(asset: 'audio/gym.mp3'));
+    // duration = await player.getDuration();
+    // }
 
     String formatDuration(Duration duration) {
       String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -1472,7 +1408,8 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                     height: size.width - 100,
                     decoration: BoxDecoration(boxShadow: [
                       BoxShadow(
-                          color: widget.color,
+                          color: Colors.black.withOpacity(0.2),
+                          //widget.color,
                           blurRadius: 100,
                           spreadRadius: 10,
                           offset: const Offset(20, 20))
@@ -1485,8 +1422,11 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                     width: size.width - 5,
                     height: size.width - 0,
                     decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage(widget.img), fit: BoxFit.cover),
+                        image: const DecorationImage(
+                            image: AssetImage('assets/images/background.jpg'
+                                // widget.img
+                                ),
+                            fit: BoxFit.cover),
                         borderRadius: BorderRadius.circular(5)),
                   ),
                 )
@@ -1585,7 +1525,6 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                               ),
                             ),
                           ),
-                          // ),
                         ),
                       ],
                     ),
@@ -1678,19 +1617,43 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                               ),
                             ),
                           ),
-                          onPressed: () async {
-                            if (isPlaying) {
-                              await player.pause();
-                            } else {
-                              // await player.play();
-                              await player.onPositionChanged
-                                  .listen((Duration d) {
-                                setState(() {
-                                  _value = d.inSeconds.toDouble();
-                                  print(_value);
-                                });
-                              });
-                            }
+                          // onPressed: () async {
+                          //   print(isPlaying);
+                          //   print(
+                          //       "--------------------------------------------------------");
+                          //   if (isPlaying) {
+                          //     print(
+                          //         "----------------------------  isPlaying:true  ----------------------------");
+                          // audioPlayer.play(); // Contunue
+                          // audioPlayer.c
+                          //   } else {
+                          //     print(
+                          //         "----------------------------  ELSE  ----------------------------");
+                          //     // await player.play();
+                          //     // await audioPlayer.onPositionChanged
+                          //     //     .listen((Duration d) {
+                          //     //   setState(() {
+                          //     //     _value = d.inSeconds.toDouble();
+                          //     //     // print(_value);
+                          //     //   });
+                          //     // });
+                          //     // pause
+                          //     audioPlayer.pause();
+                          //     audioPlayer.positionStream
+                          //         .listen((Duration position) {
+                          //       setState(() {
+                          //         _value = position.inSeconds.toDouble();
+                          //       });
+                          //     });
+                          //   }
+                          //   setState(() {
+                          //     isPlaying = !isPlaying;
+                          //   });
+                          // },
+                          onPressed: () {
+                            isPlaying
+                                ? audioPlayer.pause()
+                                : audioPlayer.play();
                             setState(() {
                               isPlaying = !isPlaying;
                             });
@@ -1729,20 +1692,6 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                 ),
               ),
             ])
-
-            // Text(widget.title,
-            //     style: const TextStyle(
-            //       color: Colors.black,
-            //       fontWeight: FontWeight.bold,
-            //       fontSize: 22,
-            //     )),
-            // Text(widget.title),
-            // const SizedBox(height: 20),
-            // Text(widget.description),
-            // const SizedBox(height: 20),
-            // Text(widget.songUrl),
-            // const SizedBox(height: 20),
-            // Text(widget.color.toString()),
           ],
         ),
       ),
