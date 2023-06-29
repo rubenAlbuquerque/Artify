@@ -566,15 +566,15 @@ class _SearchState extends State<SearchPage> {
 
   List<Album> albums = [
     Album(
-      name: "Album 1",
+      name: "StarBoy 1",
       imageUrl: "assets/images/3.jpg",
     ),
     Album(
-      name: "Album 2",
+      name: "StarBoy 2",
       imageUrl: "assets/images/background.jpg",
     ),
     Album(
-      name: "Album 3",
+      name: "StarBoy 3",
       imageUrl: "assets/images/background.jpg",
     ),
     // Adicione mais álbuns conforme necessário
@@ -670,53 +670,6 @@ class _SearchState extends State<SearchPage> {
                   ),
                 ),
               ),
-
-              // Container(
-              //   margin: const EdgeInsets.only(
-              //       top: 8, bottom: 4, left: 15, right: 15),
-              //   child: const TextField(
-              //     // controller: _searchController,
-              //     keyboardType: TextInputType.text,
-              //     textInputAction: TextInputAction.done,
-              //     // onChanged: (value) {
-              //     //   // Chama a função de pesquisa toda vez que o texto do TextField mudar
-              //     //   search();
-              //     // },
-              //     decoration: InputDecoration(
-              //       hintText: 'O que queres ouvir?',
-              //       hintStyle: TextStyle(
-              //         color: Colors.black,
-              //         fontSize: 16,
-              //       ),
-              //       border: OutlineInputBorder(
-              //         borderSide: BorderSide(color: Colors.black),
-              //       ),
-              //       focusedBorder: OutlineInputBorder(
-              //         borderSide: BorderSide(color: Colors.black),
-              //       ),
-              //       contentPadding:
-              //           EdgeInsets.symmetric(vertical: 12, horizontal: 25),
-              //       prefixIcon: Icon(
-              //         Icons.search,
-              //         color: Colors.black,
-              //         size: 36,
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              // Expanded(
-              //   child: ListView.builder(
-              //     padding: EdgeInsets.zero,
-              //     itemCount: results.length,
-              //     itemBuilder: (BuildContext context, int index) {
-              //       final result = results[index];
-              //       // Construa a visualização dos resultados da pesquisa aqui
-              //       return ListTile(
-              //         title: Text(result),
-              //       );
-              //     },
-              //   ),
-              // ),
               const SizedBox(height: 6),
               SizedBox(
                 height: 40,
@@ -898,10 +851,10 @@ class _SearchState extends State<SearchPage> {
                                     // MusicDetailPage(), // AudioPlayerSreen(),
                                     MusicDetailPage(
                                   title: album.name,
-                                  description: "album.description",
+                                  description: "Wizkid",
                                   color: Colors.black,
                                   img: album.imageUrl,
-                                  songUrl: "album.songUrl",
+                                  songUrl: "assets/audio/gym.mp3",
                                   // final String title;
                                   // final String description;
                                   // final Color color;
@@ -1343,6 +1296,8 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
   final AudioPlayer audioPlayer = AudioPlayer();
 
   Duration? duration;
+  int minutes = 0;
+  int seconds = 0;
   bool isPlaying = true;
   double _value = 0.0;
 
@@ -1350,24 +1305,55 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
   void initState() {
     super.initState();
     // _audioPlayer = AudioPlayer()..setSourceAsset('assets/gym.mp3');
-    audioPlayer.setAsset('assets/audio/gym.mp3');
-    audioPlayer.play();
+    // audioPlayer.setAsset('assets/audio/gym.mp3');
+    // audioPlayer.play();
+    // final duration = audioPlayer.duration;
+    // if (duration != null) {
+    //   final durationInSeconds = duration!.inSeconds;
+    //   final minutes = durationInSeconds ~/ 60;
+    //   final seconds = durationInSeconds % 60;
+    //   print('Duração: $minutes minutos e $seconds segundos');
+    // } else {
+    //   print('A duração da música é desconhecida.');
+    // }
+    initializeAudio();
+  }
+
+  @override
+  void dispose() {
+    audioPlayer.dispose();
+    super.dispose();
+  }
+
+  Future<void> initializeAudio() async {
+    await audioPlayer.setAsset(widget.songUrl);
+
+    audioPlayer.durationStream.listen((d) {
+      setState(() {
+        duration = d;
+        final durationInSeconds = duration!.inSeconds;
+        minutes = durationInSeconds ~/ 60;
+        seconds = durationInSeconds % 60;
+      });
+    });
+
+    audioPlayer.positionStream.listen((p) {
+      setState(() {
+        _value = p.inSeconds.toDouble();
+      });
+    });
+    await audioPlayer.play();
+  }
+
+  String formatDurationT(int minutes, int seconds) {
+    String formattedMinutes = minutes.toString().padLeft(2, '0');
+    String formattedSeconds = seconds.toString().padLeft(2, '0');
+    return '$formattedMinutes:$formattedSeconds';
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    // audioPlayer.setAsset('assets/audio/gym.mp3');
-    // audioPlayer.play();
-
-    // void initPlayer() async {
-    // https://www.youtube.com/watch?v=DIqB8qEZW1U
-    // await player.setSource(AssetSource("gym.mp3"));
-    // final AudioPlayer audioPlayer = AudioPlayer();
-    // final Duration duration = await audioPlayer.setAsset('audio/gym.mp3');
-    // await player.setAudioSource(AssetAudioSource(asset: 'audio/gym.mp3'));
-    // duration = await player.getDuration();
-    // }
 
     String formatDuration(Duration duration) {
       String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -1389,7 +1375,11 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
         elevation: 0,
         titleSpacing: 0.0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(
+            Icons.expand_more,
+            color: Colors.black,
+            size: 30,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -1408,8 +1398,8 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                     height: size.width - 100,
                     decoration: BoxDecoration(boxShadow: [
                       BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          //widget.color,
+                          // color: Colors.black.withOpacity(0.2),
+                          color: widget.color,
                           blurRadius: 100,
                           spreadRadius: 10,
                           offset: const Offset(20, 20))
@@ -1422,17 +1412,14 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                     width: size.width - 5,
                     height: size.width - 0,
                     decoration: BoxDecoration(
-                        image: const DecorationImage(
-                            image: AssetImage('assets/images/background.jpg'
-                                // widget.img
-                                ),
-                            fit: BoxFit.cover),
+                        image: DecorationImage(image: AssetImage(
+                            // 'assets/images/background.jpg'
+                            widget.img), fit: BoxFit.cover),
                         borderRadius: BorderRadius.circular(5)),
                   ),
                 )
               ],
             ),
-
             Container(
               alignment: Alignment.center,
               // color: Colors.blueGrey,
@@ -1456,39 +1443,33 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                         Padding(
                           // padding: const EdgeInsets.only( left: 10, right: 10, top: 10, bottom: 0),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 0),
+                              horizontal: 5, vertical: 8),
                           child: Column(
                             // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Container(
-                                // color: Colors.amber,
-                                child: const SizedBox(
-                                  width: 150,
-                                  child: Text(
-                                    "StarBoy",
-                                    // widget.title,
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                              SizedBox(
+                                width: 150,
+                                child: Text(
+                                  // "StarBoy",
+                                  widget.title,
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                              Container(
-                                // color: Colors.teal,
-                                child: SizedBox(
-                                  width: 150,
-                                  child: Text(
-                                    "Wizkid",
-                                    // widget.description,
-                                    maxLines: 1,
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black.withOpacity(0.5),
-                                    ),
+                              SizedBox(
+                                width: 150,
+                                child: Text(
+                                  // "Wizkid",
+                                  widget.description,
+                                  maxLines: 1,
+                                  textAlign: TextAlign.start,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black.withOpacity(0.5),
                                   ),
                                 ),
                               ),
@@ -1497,7 +1478,7 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                         ),
                         // Like
                         Material(
-                          // color: Colors.blue,
+                          color: Colors.transparent,
                           // child: Ink( shuffle, skip_back, controller_stop e play skip_forward e retweet
                           child: Align(
                             alignment: Alignment.center,
@@ -1515,7 +1496,7 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                                     // print(isPressed);
                                   });
                                 },
-                                iconSize: 45,
+                                iconSize: 35,
                                 icon: Icon(
                                   isPressed
                                       ? Icons.favorite
@@ -1532,55 +1513,84 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                 ),
               ),
             ),
-
             StatefulBuilder(builder: (context, state) {
               return Column(
                 children: [
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      trackHeight:
-                          2, // Defina a espessura desejada para o slider
-                      thumbShape: const RoundSliderThumbShape(
-                        enabledThumbRadius: 6, // Tamanho do círculo
+                  Container(
+                    // color: Colors.grey
+                    //     .withOpacity(0.2), // Define a cor de fundo desejada
+                    padding: const EdgeInsets.only(
+                        left: 10, right: 10, top: 10, bottom: 2),
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        trackHeight:
+                            2, // Defina a espessura desejada para o slider
+                        thumbShape: const RoundSliderThumbShape(
+                          enabledThumbRadius: 5, // Tamanho do círculo
+                        ),
+                        overlayShape: const RoundSliderOverlayShape(
+                          overlayRadius: 1, // Tamanho da sobreposição
+                        ),
+                        activeTrackColor: Colors.blue, // Cor da barra ativa
+                        inactiveTrackColor: Colors.grey, // Cor da barra inativa
+                        thumbColor:
+                            Colors.red, // Cor do círculo do controle deslizante
+                        overlayColor: Colors.green.withOpacity(
+                            0.4), // Cor da sobreposição ao arrastar o controle deslizante
+                        activeTickMarkColor:
+                            Colors.black, // Cor das marcas de escala ativas
+                        inactiveTickMarkColor:
+                            Colors.grey, // Cor das marcas de escala inativas
+                        valueIndicatorColor:
+                            Colors.yellow, // Cor do indicador de valor
+                        showValueIndicator: ShowValueIndicator
+                            .always, // Exibir indicador de valor
+                        valueIndicatorShape:
+                            const PaddleSliderValueIndicatorShape(), // Forma do indicador de valor
+                        valueIndicatorTextStyle: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 12,
+                        ), // Estilo do texto do indicador de valor
                       ),
-                    ),
-                    child: Slider(
-                      activeColor: Colors.black,
-                      value: _value.toDouble(),
-                      min: 0,
-                      max: 100,
-                      onChanged: (double value) {
-                        state(() {
-                          _value = value;
-                        });
-                      },
+                      child: Slider(
+                        // activeColor: Colors.black,
+                        value: _value.toDouble(),
+                        min: 0,
+                        max: duration != null
+                            ? duration!.inSeconds.toDouble()
+                            : 0,
+                        onChanged: (double value) {
+                          setState(() {
+                            _value = value;
+                            audioPlayer.seek(Duration(seconds: _value.toInt()));
+                          });
+                        },
+                        label:
+                            formatDuration(Duration(seconds: _value.toInt())),
+                      ),
                     ),
                   ),
-                  Container(
-                    // color: Colors.teal, // Substitua pela cor desejada
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            formatDuration(Duration(seconds: _value.toInt())),
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black.withOpacity(0.5),
-                            ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          formatDuration(Duration(seconds: _value.toInt())),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black.withOpacity(0.5),
                           ),
-                          Text(
-                            '3:45', // Substitua pelo tempo total da música
-                            //  "${duration!.inMinutes} : ${duration!.inSeconds % 60}",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black.withOpacity(0.5),
-                            ),
+                        ),
+                        Text(
+                          formatDurationT(minutes, seconds),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black.withOpacity(0.5),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                   Container(
@@ -1617,39 +1627,6 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                               ),
                             ),
                           ),
-                          // onPressed: () async {
-                          //   print(isPlaying);
-                          //   print(
-                          //       "--------------------------------------------------------");
-                          //   if (isPlaying) {
-                          //     print(
-                          //         "----------------------------  isPlaying:true  ----------------------------");
-                          // audioPlayer.play(); // Contunue
-                          // audioPlayer.c
-                          //   } else {
-                          //     print(
-                          //         "----------------------------  ELSE  ----------------------------");
-                          //     // await player.play();
-                          //     // await audioPlayer.onPositionChanged
-                          //     //     .listen((Duration d) {
-                          //     //   setState(() {
-                          //     //     _value = d.inSeconds.toDouble();
-                          //     //     // print(_value);
-                          //     //   });
-                          //     // });
-                          //     // pause
-                          //     audioPlayer.pause();
-                          //     audioPlayer.positionStream
-                          //         .listen((Duration position) {
-                          //       setState(() {
-                          //         _value = position.inSeconds.toDouble();
-                          //       });
-                          //     });
-                          //   }
-                          //   setState(() {
-                          //     isPlaying = !isPlaying;
-                          //   });
-                          // },
                           onPressed: () {
                             isPlaying
                                 ? audioPlayer.pause()
