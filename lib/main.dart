@@ -1022,7 +1022,7 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
 
   void clearList() {
     setState(() {
-      display_results = List.from(dummyResults);
+      display_results = [];
     });
   }
 
@@ -1116,6 +1116,7 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
               // showSearch(context: context, delegate: CustomSearchDelegate());
               // clear the search
               clearList();
+              // updateList('');
             },
             icon: const Icon(Icons.clear, color: Colors.black),
           ),
@@ -1191,85 +1192,6 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
   }
 }
 
-// import 'package:audio_library/audio_library.dart';
-
-class AudioPlayerSreen extends StatefulWidget {
-  const AudioPlayerSreen({Key? key}) : super(key: key);
-
-  @override
-  _AudioPlayerSreenState createState() => _AudioPlayerSreenState();
-}
-
-class _AudioPlayerSreenState extends State<AudioPlayerSreen> {
-  late AudioPlayer _audioPlayer;
-
-  @override
-  void initState() {
-    super.initState();
-    // _audioPlayer = AudioPlayer()..setSourceAsset('assets/gym.mp3');
-  }
-
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(213, 143, 18, 18),
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.keyboard_arrow_down_rounded,
-              color: Colors.black),
-        ),
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(20.0),
-        height: double.infinity,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color.fromARGB(63, 216, 28, 28),
-            Color.fromARGB(70, 47, 1, 231),
-          ],
-        )),
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [],
-        ),
-      ),
-    );
-  }
-}
-
-// class Controls extends StatelessWidget {
-//   const Controls({
-//     Key? key,
-//     required this.audioPlayer,
-//   });
-
-//   final AudioPlayer? audioPlayer;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return StreamBuilder<PlayerState>(
-//       stream: audioPlayer?.playerStateStream,
-//       builder: (context, snapshot){
-
-//       },),
-//   }
-// }
-
-// / / / / / / / / / / / / / / / / / / / / / /
 class MusicDetailPage extends StatefulWidget {
   final String title;
   final String description;
@@ -1435,10 +1357,6 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // const Icon(
-                        //   Icons.folder,
-                        //   color: Colors.black,
-                        // ),
                         // nome do artista e da msuica
                         Padding(
                           // padding: const EdgeInsets.only( left: 10, right: 10, top: 10, bottom: 0),
@@ -1477,36 +1395,73 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                           ),
                         ),
                         // Like
+                        // Material(
+                        //   color: Colors.transparent,
+                        //   // child: Ink( shuffle, skip_back, controller_stop e play skip_forward e retweet
+                        //   child: Align(
+                        //     alignment: Alignment.center,
+                        //     child: Padding(
+                        //       padding: const EdgeInsets.only(
+                        //           right: 0,
+                        //           top: 0,
+                        //           bottom: 0,
+                        //           left:
+                        //               0), // Adjust the padding values as needed
+                        //       child: IconButton(
+                        //         onPressed: () {
+                        //           setState(() {
+                        //             isPressed = !isPressed;
+                        //             // print(isPressed);
+                        //           });
+                        //         },
+                        //         iconSize: 35,
+                        //         icon: Icon(
+                        //           isPressed
+                        //               ? Icons.favorite
+                        //               : Icons.favorite_border,
+                        //           color: isPressed ? Colors.red : Colors.black,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                         Material(
                           color: Colors.transparent,
-                          // child: Ink( shuffle, skip_back, controller_stop e play skip_forward e retweet
                           child: Align(
                             alignment: Alignment.center,
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 0,
-                                  top: 0,
-                                  bottom: 0,
-                                  left:
-                                      0), // Adjust the padding values as needed
-                              child: IconButton(
+                              padding: const EdgeInsets.only(left: 0),
+                              child: TextButton(
                                 onPressed: () {
                                   setState(() {
                                     isPressed = !isPressed;
-                                    // print(isPressed);
                                   });
                                 },
-                                iconSize: 35,
-                                icon: Icon(
+                                style: ButtonStyle(
+                                  padding: MaterialStateProperty.all<
+                                      EdgeInsetsGeometry>(EdgeInsets.zero),
+                                  shape:
+                                      MaterialStateProperty.all<OutlinedBorder>(
+                                          CircleBorder()),
+                                  minimumSize: MaterialStateProperty.all<Size>(
+                                      Size(35, 35)),
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.transparent),
+                                  elevation: MaterialStateProperty.all<double>(
+                                      0), // Set elevation to 0
+                                ),
+                                child: Icon(
                                   isPressed
                                       ? Icons.favorite
                                       : Icons.favorite_border,
                                   color: isPressed ? Colors.red : Colors.black,
+                                  size: 35,
                                 ),
                               ),
                             ),
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),
@@ -1676,43 +1631,718 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
   }
 }
 
-// @override
-// Widget build(BuildContext context) {
-//   return Scaffold(
-//     appBar: AppBar(
-//       // toolbarHeight: 120,
-//       automaticallyImplyLeading: false,
-//       backgroundColor: Colors.transparent,
-//       elevation: 0,
-//       // titleSpacing: 0.0,
-//       leading: IconButton(
-//         onPressed: () {
-//           // showSearch(context: context, delegate: CustomSearchDelegate());
-//           Navigator.pop(context);
-//         },
-//         icon: const Icon(Icons.arrow_back, color: Colors.black),
-//       ),
-//       title: const Text(
-//         'O que queres ouvir ?',
-//         style: TextStyle(
-//           fontSize: 16,
-//           fontWeight: FontWeight.bold,
-//           color: Colors.black,
-//         ),
-//       ),
-//       actions: [
-//         IconButton(
-//           onPressed: () {
-//             // showSearch(context: context, delegate: CustomSearchDelegate());
-//           },
-//           icon: const Icon(Icons.clear, color: Colors.black),
-//         ),
-//       ],
-//     ),
-//   );
-// }
+class LibraryPage extends StatefulWidget {
+  const LibraryPage({Key? key}) : super(key: key);
 
-// CustomSearchDelegate
+  @override
+  _LibraryPageState createState() => _LibraryPageState();
+}
+
+class _LibraryPageState extends State<LibraryPage> {
+  List<String> results = [];
+  bool isList = true;
+
+  List<Album> libraryData = [
+    Album(
+      name: "StarBoy 1",
+      imageUrl: "assets/images/3.jpg",
+    ),
+    Album(
+      name: "StarBoy 2",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 3",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 4",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 5",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 1",
+      imageUrl: "assets/images/3.jpg",
+    ),
+    Album(
+      name: "StarBoy 2",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 3",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 4",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 5",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 1",
+      imageUrl: "assets/images/3.jpg",
+    ),
+    Album(
+      name: "StarBoy 2",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 3",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 4",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    Album(
+      name: "StarBoy 5",
+      imageUrl: "assets/images/background.jpg",
+    ),
+    // Adicione mais álbuns conforme necessário
+  ];
+
+  void _createPlaylist() {}
+
+  @override
+  Widget build(BuildContext context) {
+    // var size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0.0, // Remover sombra da AppBar
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false, // Remover botão de retorno
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/playstore.png',
+              width: 32,
+              height: 32,
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'Library',
+              style: TextStyle(fontSize: 20, color: Colors.black),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.search,
+              color: Colors.black,
+              size: 30,
+            ),
+            onPressed: () {
+              // Lógica para o botão de pesquisa
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      // body: Text("Library"),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 40,
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            const SizedBox(width: 15),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Ação quando o botão "Albums" é pressionado
+                              },
+                              style: ButtonStyle(
+                                padding: MaterialStateProperty.all<EdgeInsets>(
+                                  const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
+                                ),
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.white),
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.black),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: const BorderSide(color: Colors.black),
+                                  ),
+                                ),
+                              ),
+                              child: const Text('Albums'),
+                            ),
+                            const SizedBox(width: 5),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Ação quando o botão "Artistas" é pressionado
+                              },
+                              style: ButtonStyle(
+                                padding: MaterialStateProperty.all<EdgeInsets>(
+                                  const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
+                                ),
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.white),
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.black),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: const BorderSide(color: Colors.black),
+                                  ),
+                                ),
+                              ),
+                              child: const Text('Artistas'),
+                            ),
+                            const SizedBox(width: 5),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Ação quando o botão "Músicas" é pressionado
+                              },
+                              style: ButtonStyle(
+                                padding: MaterialStateProperty.all<EdgeInsets>(
+                                  const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
+                                ),
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.white),
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.black),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: const BorderSide(color: Colors.black),
+                                  ),
+                                ),
+                              ),
+                              child: const Text('Músicas'),
+                            ),
+                            const SizedBox(width: 5),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Ação quando o botão "Playlists" é pressionado
+                              },
+                              style: ButtonStyle(
+                                padding: MaterialStateProperty.all<EdgeInsets>(
+                                  const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
+                                ),
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.white),
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.black),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: const BorderSide(color: Colors.black),
+                                  ),
+                                ),
+                              ),
+                              child: const Text('Playlists'),
+                            ),
+                            const SizedBox(width: 5),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Ação quando o botão "Playlists" é pressionado
+                              },
+                              style: ButtonStyle(
+                                padding: MaterialStateProperty.all<EdgeInsets>(
+                                  const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
+                                ),
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.white),
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.black),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: const BorderSide(color: Colors.black),
+                                  ),
+                                ),
+                              ),
+                              child: const Text('Playlists'),
+                            ),
+                            const SizedBox(width: 5),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Row(
+                              children: [
+                                SizedBox(width: 5),
+                                Icon(Icons.sort, color: Colors.black),
+                                SizedBox(width: 12),
+                                Text(
+                                  "Recent Added",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    isList = !isList;
+                                  });
+                                },
+                                child: Icon(
+                                  isList ? Icons.list : Icons.grid_view_rounded,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Visibility(
+                        visible:
+                            isList, // Define a visibilidade com base no valor de isList
+                        child: SingleChildScrollView(
+                          child: Container(
+                            // color: Colors.blue,
+                            height: MediaQuery.of(context).size.height * 0.65,
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.only(
+                                  left: 14, right: 10, top: 10, bottom: 10),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3, // Número de colunas desejado
+                                crossAxisSpacing:
+                                    5, // Espaçamento entre as colunas
+                                mainAxisSpacing:
+                                    5, // Espaçamento entre as linhas
+                                mainAxisExtent: 150, // Altura das linhas
+                              ),
+                              itemCount: libraryData.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final data = libraryData[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MusicDetailPage(
+                                          title: data.name,
+                                          description: "Wizkid",
+                                          color: Colors.black,
+                                          img: data.imageUrl,
+                                          songUrl: "assets/audio/gym.mp3",
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    child: Column(
+                                      children: [
+                                        ClipRect(
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: Image.asset(
+                                              data.imageUrl,
+                                              fit: BoxFit.cover,
+                                              height: 100,
+                                              width: 100,
+                                            ),
+                                          ),
+                                        ),
+                                        const Padding(
+                                          padding: EdgeInsets.only(
+                                              left: 0.0,
+                                              top: 2.0,
+                                              bottom: 1.0,
+                                              right: 1.0),
+                                          child: Text(
+                                            'Título da Legenda',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                              // letterSpacing: -0.4,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            softWrap: false,
+                                          ),
+                                        ),
+                                        const Padding(
+                                          padding: EdgeInsets.only(
+                                              left: 0.0,
+                                              top: 2.0,
+                                              bottom: 1.0,
+                                              right: 1.0),
+                                          child: Text(
+                                            'Subtítulo da Legenda',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
+                                              // letterSpacing: -0.4,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            softWrap: false,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      Visibility(
+                        visible:
+                            !isList, // Define a visibilidade com base no valor inverso de isList
+                        child: SingleChildScrollView(
+                          child: Container(
+                            // color: Colors.amber,
+                            // width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height * 0.65,
+                            padding: const EdgeInsets.only(
+                                left: 0, right: 0, top: 0, bottom: 0),
+                            child: ListView.builder(
+                              itemCount: libraryData.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final data = libraryData[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 6.0),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MusicDetailPage(
+                                            title: data.name,
+                                            description: "Wizkid",
+                                            color: Colors.black,
+                                            img: data.imageUrl,
+                                            songUrl: "assets/audio/gym.mp3",
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      // color: Colors.red,
+                                      margin: const EdgeInsets.only(
+                                          left: 14, right: 14),
+                                      // padding: const EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(4),
+                                        // border: Border.all(
+                                        //   color: Colors.black,
+                                        //   width: 0.1,
+                                        // ),
+                                      ),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(0),
+                                            child: Image.asset(
+                                              data.imageUrl,
+                                              fit: BoxFit.cover,
+                                              height: 70,
+                                              width: 70,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  data.name,
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                const Text(
+                                                  "data.description",
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            bottom: 5, // Vertical position
+            right: 10, // Horizontal position
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NewPlaylistPage(),
+                  ),
+                );
+              },
+              child: Container(
+                width: 145,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.black),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add,
+                      color: Colors.black,
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      'New Playlist',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        color: const Color.fromARGB(75, 70, 70, 70),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: GNav(
+            // backgroundColor: Color.fromARGB(0, 136, 136, 136),
+            // rippleColor: Color.fromARGB(255, 226, 0, 0),
+            // hoverColor: Color.fromARGB(255, 0, 255, 13),
+            color: Colors.black,
+            activeColor: Color.fromARGB(255, 214, 214, 214),
+            // tabActiveBorder:
+            //     Border.all(color: Color.fromARGB(255, 255, 255, 255), width: 1),
+            tabBackgroundColor: Colors.black,
+            // padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+            // selectedIndex: _selectedIndex, 0
+            gap: 6,
+            iconSize: 24,
+            // selectedIndex: 0,
+            selectedIndex: 2,
+            onTabChange: (index) {
+              // print(index);
+
+              if (index == 0) {
+                Navigator.pushReplacementNamed(context, '/home');
+              } else if (index == 1) {
+                Navigator.pushReplacementNamed(context, '/search');
+              } else if (index == 2) {
+                Navigator.pushReplacementNamed(context, '/library');
+              } else if (index == 3) {
+                Navigator.pushReplacementNamed(context, '/profile');
+              }
+            },
+            tabs: [
+              GButton(
+                icon: Icons.home,
+                text: 'Home',
+                // height: 100.0,
+              ),
+              GButton(
+                icon: Icons.search,
+                text: 'Search',
+              ),
+              GButton(
+                icon: Icons.library_books,
+                text: 'Library',
+              ),
+              GButton(
+                icon: Icons.person,
+                text: 'Profile',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// / / / / / / / / / / / / / / / / / / / / / /
+
+class NewPlaylistPage extends StatefulWidget {
+  const NewPlaylistPage({Key? key}) : super(key: key);
+
+  @override
+  _NewPlaylistPageState createState() => _NewPlaylistPageState();
+}
+
+class _NewPlaylistPageState extends State<NewPlaylistPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // butao no centro e uma lista por debaixo
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black87,
+          ),
+        ),
+        
+        // title: const Text(
+        //   'New Playlist',
+        //   style: TextStyle(
+        //     fontSize: 20,
+        //     fontWeight: FontWeight.bold,
+        //   ),
+        // ),
+        // centerTitle: true,
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {},
+        //     icon: const Icon(Icons.more_vert),
+        //   ),
+        // ],
+
+
+      ),
+    );
+  }
+}
+
+//
+class AudioPlayerSreen extends StatefulWidget {
+  const AudioPlayerSreen({Key? key}) : super(key: key);
+
+  @override
+  _AudioPlayerSreenState createState() => _AudioPlayerSreenState();
+}
+
+class _AudioPlayerSreenState extends State<AudioPlayerSreen> {
+  late AudioPlayer _audioPlayer;
+
+  @override
+  void initState() {
+    super.initState();
+    // _audioPlayer = AudioPlayer()..setSourceAsset('assets/gym.mp3');
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(213, 143, 18, 18),
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.keyboard_arrow_down_rounded,
+              color: Colors.black),
+        ),
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(20.0),
+        height: double.infinity,
+        width: double.infinity,
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color.fromARGB(63, 216, 28, 28),
+            Color.fromARGB(70, 47, 1, 231),
+          ],
+        )),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [],
+        ),
+      ),
+    );
+  }
+}
+
+// CustomSearchDelegate IMPORTANTE, mas nao utilizado
 class CustomSearchDelegate extends SearchDelegate {
   List<String> searchTerms = [
     'Aearch term 1',
@@ -1907,80 +2537,6 @@ class MusicPlayerPage extends StatelessWidget {
 
           // Add music player controls here (e.g., play/pause buttons, seek bar, etc.)
         ],
-      ),
-    );
-  }
-}
-
-class LibraryPage extends StatelessWidget {
-  const LibraryPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          automaticallyImplyLeading: false, // Remover botão de retorno
-          title: const Text('Library')),
-      body: const Center(
-        child: Text(
-          'Library',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        color: const Color.fromARGB(75, 70, 70, 70),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: GNav(
-            // backgroundColor: Color.fromARGB(0, 136, 136, 136),
-            // rippleColor: Color.fromARGB(255, 226, 0, 0),
-            // hoverColor: Color.fromARGB(255, 0, 255, 13),
-            color: Colors.black,
-            activeColor: Color.fromARGB(255, 214, 214, 214),
-            // tabActiveBorder:
-            //     Border.all(color: Color.fromARGB(255, 255, 255, 255), width: 1),
-            tabBackgroundColor: Colors.black,
-            // padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-            // selectedIndex: _selectedIndex, 0
-            gap: 6,
-            iconSize: 24,
-            // selectedIndex: 0,
-            selectedIndex: 2,
-            onTabChange: (index) {
-              // print(index);
-
-              if (index == 0) {
-                Navigator.pushReplacementNamed(context, '/home');
-              } else if (index == 1) {
-                Navigator.pushReplacementNamed(context, '/search');
-              } else if (index == 2) {
-                Navigator.pushReplacementNamed(context, '/library');
-              } else if (index == 3) {
-                Navigator.pushReplacementNamed(context, '/profile');
-              }
-            },
-            tabs: [
-              GButton(
-                icon: Icons.home,
-                text: 'Home',
-                // height: 100.0,
-              ),
-              GButton(
-                icon: Icons.search,
-                text: 'Search',
-              ),
-              GButton(
-                icon: Icons.library_books,
-                text: 'Library',
-              ),
-              GButton(
-                icon: Icons.person,
-                text: 'Profile',
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
