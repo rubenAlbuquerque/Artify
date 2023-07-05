@@ -2261,23 +2261,133 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
             color: Colors.black87,
           ),
         ),
-        
-        // title: const Text(
-        //   'New Playlist',
-        //   style: TextStyle(
-        //     fontSize: 20,
-        //     fontWeight: FontWeight.bold,
-        //   ),
-        // ),
-        // centerTitle: true,
-        // actions: [
-        //   IconButton(
-        //     onPressed: () {},
-        //     icon: const Icon(Icons.more_vert),
-        //   ),
-        // ],
-
-
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Container(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // Lógica para fazer upload de uma imagem
+                        // Implemente aqui a funcionalidade de upload da imagem
+                        print("Upload");
+                      },
+                      child: Stack(
+                        children: [
+                          const CircleAvatar(
+                            radius: 50,
+                            // backgroundColor: Colors.grey,
+                            backgroundImage:
+                                AssetImage('assets/images/funny.jpg'),
+                          ),
+                          Container(
+                            height: 100,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.black.withOpacity(
+                                  0.5), // Adiciona uma camada de opacidade preta
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // const Text(
+                    //   'New Playlist',
+                    //   style: TextStyle(
+                    //     fontSize: 24,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Give your playlist a name',
+                      style: TextStyle(
+                        fontSize: 20,
+                        // color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      // color: Colors.amber,
+                      margin: const EdgeInsets.symmetric(horizontal: 40),
+                      child: const TextField(
+                        // style: TextStyle(
+                        //     fontSize: 20), // Define o tamanho da fonte como 20
+                        decoration: InputDecoration(
+                          hintText: 'Playlist name',
+                          hintStyle: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                          contentPadding: EdgeInsets.zero,
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey,
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(right: 10.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Lógica para cancelar (back)
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0, // Remove a sombra
+                              minimumSize: const Size(
+                                  110, 45), // Aumenta o tamanho do botão
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              side: BorderSide(color: Colors.black, width: 1.0),
+                            ),
+                            child: Text('Cancelar'),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Lógica para Criar (aaddicionar playlist)
+                            },
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0, // Remove a sombra
+                              minimumSize:
+                                  Size(90, 45), // Aumenta o tamanho do botão
+                              backgroundColor: Colors.blue[900],
+                              foregroundColor: Colors.white,
+                              // side: BorderSide(color: Colors.black, width: 1.0),
+                            ),
+                            child: Text('Criar'),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
