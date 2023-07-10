@@ -120,26 +120,6 @@ class LoginPage extends StatelessWidget {
             ],
           ),
         ),
-        // child: Column(
-        //   mainAxisAlignment: MainAxisAlignment.center,
-        //   children: [
-        //     const Text(
-        //       'Bem-vindo!',
-        //       style: TextStyle(
-        //         fontSize: 24,
-        //         fontWeight: FontWeight.bold,
-        //       ),
-        //     ),
-        //     const SizedBox(height: 16),
-        //     SignInButton(
-        //       Buttons.Google,
-        //       onPressed: () {
-        //         // Lógica de autenticação com o Google aqui
-        //         Navigator.pushReplacementNamed(context, '/home');
-        //       },
-        //     ),
-        //   ],
-        // ),
       ),
     );
   }
@@ -2235,8 +2215,6 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 }
 
-// / / / / / / / / / / / / / / / / / / / / / /
-
 class NewPlaylistPage extends StatefulWidget {
   const NewPlaylistPage({Key? key}) : super(key: key);
 
@@ -2322,16 +2300,27 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
                     Container(
                       // color: Colors.amber,
                       margin: const EdgeInsets.symmetric(horizontal: 40),
+                      // padding: EdgeInsets.symmetric(vertical: -5.0),
                       child: const TextField(
-                        // style: TextStyle(
-                        //     fontSize: 20), // Define o tamanho da fonte como 20
+                        style: TextStyle(
+                          fontSize: 20,
+                          // decoration: TextDecoration
+                          //     .none, // Remove qualquer decoração existente
+                          // decorationStyle: null,
+                          // decorationStyle: TextDecorationStyle.solid,
+                        ), // Define o tamanho da fonte como 20
+
                         decoration: InputDecoration(
                           hintText: 'Playlist name',
                           hintStyle: TextStyle(
-                            fontSize: 16,
+                            fontSize: 20,
                             color: Colors.grey,
                           ),
-                          contentPadding: EdgeInsets.zero,
+                          contentPadding: EdgeInsets.only(left: 10.0),
+                          // enabledBorder: UnderlineInputBorder(
+                          //   borderSide:
+                          //       BorderSide.none, // Removes the underline
+                          // ),
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
                               color: Colors.grey,
@@ -2341,12 +2330,12 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(right: 10.0),
+                          padding: EdgeInsets.only(right: 5.0),
                           child: ElevatedButton(
                             onPressed: () {
                               // Lógica para cancelar (back)
@@ -2355,16 +2344,20 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
                             style: ElevatedButton.styleFrom(
                               elevation: 0, // Remove a sombra
                               minimumSize: const Size(
-                                  110, 45), // Aumenta o tamanho do botão
+                                  120, 50), // Aumenta o tamanho do botão
                               backgroundColor: Colors.white,
                               foregroundColor: Colors.black,
-                              side: BorderSide(color: Colors.black, width: 1.0),
+                              side: BorderSide(color: Colors.black, width: 0.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    40.0), // Define o raio de arredondamento
+                              ),
                             ),
                             child: Text('Cancelar'),
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.only(left: 10.0),
+                          padding: EdgeInsets.only(left: 5.0),
                           child: ElevatedButton(
                             onPressed: () {
                               // Lógica para Criar (aaddicionar playlist)
@@ -2372,10 +2365,14 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
                             style: ElevatedButton.styleFrom(
                               elevation: 0, // Remove a sombra
                               minimumSize:
-                                  Size(90, 45), // Aumenta o tamanho do botão
+                                  Size(100, 50), // Aumenta o tamanho do botão
                               backgroundColor: Colors.blue[900],
                               foregroundColor: Colors.white,
                               // side: BorderSide(color: Colors.black, width: 1.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    40.0), // Define o raio de arredondamento
+                              ),
                             ),
                             child: Text('Criar'),
                           ),
@@ -2393,7 +2390,220 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
   }
 }
 
-//
+// / / / / / / / / / / / / / / / / / / / / / / / /
+
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({Key? key}) : super(key: key);
+
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  @override
+  Widget build(BuildContext context) {
+    final marginHeight = MediaQuery.of(context).size.height * 0.3;
+
+    return Scaffold(
+      body: Container(
+        // color: Colors.black.withOpacity(0.5),
+        child: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/background.jpg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+
+            Container(
+              margin: EdgeInsets.only(top: marginHeight),
+              color: Colors.white.withOpacity(0.9),
+              padding: EdgeInsets.only(left: 14, top: 5, bottom: 5, right: 14),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    color: Colors.amber.withOpacity(0.9),
+                    width: 90,
+                    padding: const EdgeInsets.only(
+                        left: 0, top: 0, bottom: 0, right: 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: AssetImage(
+                            'assets/images/background.jpg',
+                          ),
+                          radius: 38,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          'TheWeenkend',
+                          style: TextStyle(
+                            fontSize: 12,
+                            // fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.blue.withOpacity(0.9),
+                    // width: 90,
+                    padding: const EdgeInsets.only(
+                        left: 10, top: 10, bottom: 0, right: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Column(
+                              children: [
+                                Text(
+                                  '2.9M',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    // fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'followers',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    // fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 5),
+                            Column(
+                              children: [
+                                Text(
+                                  '5.9',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'rating',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    // fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 5),
+                            Column(
+                              children: [
+                                Text(
+                                  '2.9M',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    // fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'followers',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    // fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          // descricao
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Lorem ipsum dolor sit amet . \n Lorem ipsum dolor sit amet .',
+                              style: TextStyle(
+                                fontSize: 12,
+                                // fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        color: const Color.fromARGB(75, 70, 70, 70),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: GNav(
+            // backgroundColor: Color.fromARGB(0, 136, 136, 136),
+            // rippleColor: Color.fromARGB(255, 226, 0, 0),
+            // hoverColor: Color.fromARGB(255, 0, 255, 13),
+            color: Colors.black,
+            activeColor: Color.fromARGB(255, 214, 214, 214),
+            // tabActiveBorder:
+            //     Border.all(color: Color.fromARGB(255, 255, 255, 255), width: 1),
+            tabBackgroundColor: Colors.black,
+            // padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+            // selectedIndex: _selectedIndex, 0
+            gap: 6,
+            iconSize: 24,
+            // selectedIndex: 0,
+            selectedIndex: 3,
+            onTabChange: (index) {
+              // print(index);
+
+              if (index == 0) {
+                Navigator.pushReplacementNamed(context, '/home');
+              } else if (index == 1) {
+                Navigator.pushReplacementNamed(context, '/search');
+              } else if (index == 2) {
+                Navigator.pushReplacementNamed(context, '/library');
+              } else if (index == 3) {
+                Navigator.pushReplacementNamed(context, '/profile');
+              }
+            },
+            tabs: [
+              GButton(
+                icon: Icons.home,
+                text: 'Home',
+                // height: 100.0,
+              ),
+              GButton(
+                icon: Icons.search,
+                text: 'Search',
+              ),
+              GButton(
+                icon: Icons.library_books,
+                text: 'Library',
+              ),
+              GButton(
+                icon: Icons.person,
+                text: 'Profile',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class AudioPlayerSreen extends StatefulWidget {
   const AudioPlayerSreen({Key? key}) : super(key: key);
 
@@ -2647,79 +2857,6 @@ class MusicPlayerPage extends StatelessWidget {
 
           // Add music player controls here (e.g., play/pause buttons, seek bar, etc.)
         ],
-      ),
-    );
-  }
-}
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          automaticallyImplyLeading: false, // Remover botão de retorno
-          title: const Text('Profile')),
-      body: const Center(
-        child: Text(
-          'Profile',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        color: const Color.fromARGB(75, 70, 70, 70),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: GNav(
-            // backgroundColor: Color.fromARGB(0, 136, 136, 136),
-            // rippleColor: Color.fromARGB(255, 226, 0, 0),
-            // hoverColor: Color.fromARGB(255, 0, 255, 13),
-            color: Colors.black,
-            activeColor: Color.fromARGB(255, 214, 214, 214),
-            // tabActiveBorder:
-            //     Border.all(color: Color.fromARGB(255, 255, 255, 255), width: 1),
-            tabBackgroundColor: Colors.black,
-            // padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-            // selectedIndex: _selectedIndex, 0
-            gap: 6,
-            iconSize: 24,
-            // selectedIndex: 0,
-            selectedIndex: 3,
-            onTabChange: (index) {
-              // print(index);
-
-              if (index == 0) {
-                Navigator.pushReplacementNamed(context, '/home');
-              } else if (index == 1) {
-                Navigator.pushReplacementNamed(context, '/search');
-              } else if (index == 2) {
-                Navigator.pushReplacementNamed(context, '/library');
-              } else if (index == 3) {
-                Navigator.pushReplacementNamed(context, '/profile');
-              }
-            },
-            tabs: [
-              GButton(
-                icon: Icons.home,
-                text: 'Home',
-                // height: 100.0,
-              ),
-              GButton(
-                icon: Icons.search,
-                text: 'Search',
-              ),
-              GButton(
-                icon: Icons.library_books,
-                text: 'Library',
-              ),
-              GButton(
-                icon: Icons.person,
-                text: 'Profile',
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
