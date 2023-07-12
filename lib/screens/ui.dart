@@ -6,6 +6,8 @@ import 'package:artify/models/models.dart';
 
 import '../services/services.dart';
 // import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -17,38 +19,69 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  Future<void> _signInWithGoogle(BuildContext context) async {
-    final userCredential = await AuthService().signInWithGoogle();
-    print("userCredential");
-    print(userCredential);
-    if (userCredential != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
-      // navigatorKey.currentState!.push(
-      //   MaterialPageRoute(builder: (context) => const HomePage()),
-      // );
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('E-mail não verificado'),
-            content: const Text(
-                'Por favor, verifique seu e-mail antes de fazer login.'),
-            actions: <Widget>[
-              ElevatedButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
+  // Future<void> _signInWithGoogle(BuildContext context) async {
+  //   final userCredential = await AuthService().signInWithGoogle();
+  //   print("userCredential");
+  //   print(userCredential);
+  //   if (userCredential != null) {
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => const HomePage()),
+  //     );
+  //     // navigatorKey.currentState!.push(
+  //     //   MaterialPageRoute(builder: (context) => const HomePage()),
+  //     // );
+  //   } else {
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           title: const Text('E-mail não verificado'),
+  //           content: const Text(
+  //               'Por favor, verifique seu e-mail antes de fazer login.'),
+  //           actions: <Widget>[
+  //             ElevatedButton(
+  //               child: const Text('OK'),
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //   }
+  // }
+  Future<void> _signInWithGoogle() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final GoogleSignIn? googlesignIn = GoogleSignIn();
+
+    final GoogleSignInAccount? googleUser = await googlesignIn!.signIn();
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser!.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final UserCredential userCredential =
+        await auth.signInWithCredential(credential);
+
+    // final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // // obtain the auth details from the request
+    // final GoogleSignInAuthentication googleAuth =
+    //     await googleUser!.authentication;
+
+    // // obtain google sign in credentials
+    // final credential = GoogleAuthProvider.credential(
+    //   accessToken: googleAuth.accessToken,
+    //   idToken: googleAuth.idToken,
+    // );
+    // // sign in to firebase with google credentials
+    // await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   @override
@@ -85,42 +118,52 @@ class _LoginPageState extends State<LoginPage> {
               // add a button
 
               ElevatedButton(
-                // onPressed: () => _signInWithGoogle(context),
-                onPressed: () {
-                  AuthService().signInWithGoogle();
-                  // AuthService().signInWithGoogle().then((userCredential) {
-                  //   if (userCredential != null) {
-                  //     // O usuário foi autenticado com sucesso
-                  //     // Faça algo aqui, como navegar para a próxima tela
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //           builder: (context) => const HomePage()),
-                  //     );
-                  //   } else {
-                  //     // Ocorreu um erro durante a autenticação
-                  //     // Trate o erro ou mostre uma mensagem de erro ao usuário
-                  //     showDialog(
-                  //       context: context,
-                  //       builder: (BuildContext context) {
-                  //         return AlertDialog(
-                  //           title: const Text('Erro de autenticação'),
-                  //           content: const Text(
-                  //               'Não foi possível fazer login com o Google.'),
-                  //           actions: <Widget>[
-                  //             ElevatedButton(
-                  //               child: const Text('OK'),
-                  //               onPressed: () {
-                  //                 Navigator.of(context).pop();
-                  //               },
-                  //             ),
-                  //           ],
-                  //         );
-                  //       },
-                  //     );
-                  //   }
-                  // });
+                onPressed: () async {
+                  // await _signInWithGoogle();
+                  await AuthService().signInWithGoogle();
+
+                  if (mounted) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    );
+                  }
                 },
+                // onPressed: () {
+                //   AuthService().signInWithGoogle();
+                // AuthService().signInWithGoogle().then((userCredential) {
+                //   if (userCredential != null) {
+                //     // O usuário foi autenticado com sucesso
+                //     // Faça algo aqui, como navegar para a próxima tela
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) => const HomePage()),
+                // );
+                //   } else {
+                //     // Ocorreu um erro durante a autenticação
+                //     // Trate o erro ou mostre uma mensagem de erro ao usuário
+                //     showDialog(
+                //       context: context,
+                //       builder: (BuildContext context) {
+                //         return AlertDialog(
+                //           title: const Text('Erro de autenticação'),
+                //           content: const Text(
+                //               'Não foi possível fazer login com o Google.'),
+                //           actions: <Widget>[
+                //             ElevatedButton(
+                //               child: const Text('OK'),
+                //               onPressed: () {
+                //                 Navigator.of(context).pop();
+                //               },
+                //             ),
+                //           ],
+                //         );
+                //       },
+                //     );
+                //   }
+                // });
+                // },
                 // Lógica de autenticação com o Google aqui
                 // final userCredential = AuthService().signInWithGoogle();
 
@@ -281,6 +324,14 @@ class _HomeState extends State<HomePage> {
   //   super.dispose();
   // }
 
+  Future<void> logOut() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    await googleSignIn.signOut();
+
+    // await FirebaseAuth.instance.signOut();
+    // Navigator.pushReplacementNamed(context, '/login');
+  }
+
   void _handleTabChange(int index) {
     // if (mounted) {
     // setState(() {
@@ -337,9 +388,13 @@ class _HomeState extends State<HomePage> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.person, color: Colors.black),
-            onPressed: () {
-              // Lógica para o botão de perfil
+            icon: const Icon(Icons.logout, color: Colors.black),
+            onPressed: () async {
+              // Lógica para o botão de logout
+              await logOut();
+
+              //voltar para o login
+              Navigator.pushReplacementNamed(context, '/login');
             },
           ),
         ],
@@ -2421,6 +2476,10 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  String? getFirstName() {
+    String? fullName = AuthService().getUserName();
+  }
+
   @override
   Widget build(BuildContext context) {
     final marginHeight = MediaQuery.of(context).size.height * 0.3;
@@ -2440,8 +2499,9 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             Container(
               margin: EdgeInsets.only(top: marginHeight),
-              color: Colors.white.withOpacity(0.9),
-              padding: EdgeInsets.only(left: 14, top: 5, bottom: 5, right: 14),
+              color: Colors.white.withOpacity(0.8),
+              padding:
+                  const EdgeInsets.only(left: 14, top: 5, bottom: 5, right: 14),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -2450,20 +2510,29 @@ class _ProfilePageState extends State<ProfilePage> {
                     width: 90,
                     padding: const EdgeInsets.only(
                         left: 0, top: 0, bottom: 0, right: 0),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         CircleAvatar(
-                          backgroundImage: AssetImage(
-                            'assets/images/background.jpg',
-                          ),
+                          // profile image from google acount
+                          // backgroundImage: AssetImage(
+                          //   getProfileImage(),
+                          // ),
+                          // backgroundImage:
+                          //     Image.network(
+                          //       // Provider.of(context).auth.getProfileImage()),
+                          //       AuthService().getProfileImage()),
+                          backgroundImage: NetworkImage(
+                              AuthService().getProfileImage() ?? ''),
+
                           radius: 38,
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 1),
                         Text(
-                          'TheWeenkend',
-                          style: TextStyle(
-                            fontSize: 12,
+                          AuthService().getUserName() ?? '',
+                          // getFirstName(),
+                          style: const TextStyle(
+                            fontSize: 16,
                             // fontWeight: FontWeight.bold,
                           ),
                         ),
