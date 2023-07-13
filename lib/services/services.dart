@@ -52,27 +52,34 @@ class AuthService {
         "seguidores": "0",
         "verify": true
       });
-    }
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'name': userCredential.user!.displayName,
+        'email': userCredential.user!.email,
+        'image':
+            "https://example.com/profile.jpg",
+        'bio': "I love music!", 
+        'numFollowers': 0, 
+        'rating': 0, 
+        'musicas': ["song1", "song2", "song3"],
+        'albums': [
+          "album1",
+          "album2",
+          "album3"
+        ],
+        'playlists': [
+          "playlist1",
+          "playlist2",
+          "playlist3"
+        ],
+        'verify': true
+      });
+    };
 
-    ;
-    // var querySnapshot = await FirebaseFirestore.instance
-    //     .collection('users')
-    //     // .where('verify', isEqualTo: true)
-    //     .where('userId', isEqualTo: userCredential.user!.uid)
-    //     .limit(1)
-    //     .get();
-
-    // print(querySnapshot);
   }
 
-  // register user in user database in firebase with adicional data
-
-  // Future<void> register() {
-  //   final FirestoreService firestoreService = FirestoreService('users');
-
-  //   // return null;
-  //   throw UnimplementedError('register method is not implemented yet');
-  // }
 
   // obter nome do usuário
   String? getUserName() {
@@ -107,90 +114,85 @@ class AuthService {
 }
 
 // Classe to save the user data in the database firebase
-class User {
-  String? uid;
-  String? name;
-  String? email;
-  String? profileImage;
-  String? bio;
-  String? Nfollowers;
-  String? Nrating;
-  String? Nfollowing;
-  // String? Nposts;
+// class User {
+//   String? uid;
+//   String? name;
+//   String? email;
+//   String? profileImage;
+//   String? bio;
+//   String? Nfollowers;
+//   String? Nrating;
+//   String? Nfollowing;
+//   // String? Nposts;
+//   User(
+//       {this.uid,
+//       this.name,
+//       this.email,
+//       this.profileImage,
+//       this.bio,
+//       this.Nfollowers,
+//       this.Nrating,
+//       this.Nfollowing});
+//   Map<String, dynamic> toMap() {
+//     return {
+//       'uid': uid,
+//       'name': name,
+//       'email': email,
+//       'profileImage': profileImage,
+//       'bio': bio,
+//       'Nfollowers': Nfollowers,
+//       'Nrating': Nrating,
+//       'Nfollowing': Nfollowing,
+//       // 'Nposts': Nposts,
+//     };
+//   }
+//   User.fromFirestore(Map<String, dynamic> firestore)
+//       : uid = firestore['uid'],
+//         name = firestore['name'],
+//         email = firestore['email'],
+//         profileImage = firestore['profileImage'],
+//         bio = firestore['bio'],
+//         Nfollowers = firestore['Nfollowers'],
+//         Nrating = firestore['Nrating'],
+//         Nfollowing = firestore['Nfollowing'];
+//   // Nposts = firestore['Nposts'];
+// }
 
-  User(
-      {this.uid,
-      this.name,
-      this.email,
-      this.profileImage,
-      this.bio,
-      this.Nfollowers,
-      this.Nrating,
-      this.Nfollowing});
-
-  Map<String, dynamic> toMap() {
-    return {
-      'uid': uid,
-      'name': name,
-      'email': email,
-      'profileImage': profileImage,
-      'bio': bio,
-      'Nfollowers': Nfollowers,
-      'Nrating': Nrating,
-      'Nfollowing': Nfollowing,
-      // 'Nposts': Nposts,
-    };
-  }
-
-  User.fromFirestore(Map<String, dynamic> firestore)
-      : uid = firestore['uid'],
-        name = firestore['name'],
-        email = firestore['email'],
-        profileImage = firestore['profileImage'],
-        bio = firestore['bio'],
-        Nfollowers = firestore['Nfollowers'],
-        Nrating = firestore['Nrating'],
-        Nfollowing = firestore['Nfollowing'];
-  // Nposts = firestore['Nposts'];
-}
-
-class UserService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String _collectionName = 'users';
-
-  Future<void> saveUserData({
-    required String uid,
-    required String name,
-    required String email,
-    required String profileImage,
-    required String bio,
-    required String Nfollowers,
-    required String Nrating,
-    required String Nfollowing,
-    // required String Nposts,
-  }) async {
-    try {
-      // Crie um documento com o UID do usuário
-      final DocumentReference userDocRef =
-          _firestore.collection(_collectionName).doc(uid);
-
-      // Salve os dados do usuário no documento
-      await userDocRef.set({
-        'name': name,
-        'email': email,
-        'profileImage': profileImage,
-        'bio': bio,
-        'Nfollowers': Nfollowers,
-        'Nrating': Nrating,
-        'Nfollowing': Nfollowing,
-        // 'Nposts': Nposts,
-      });
-    } catch (e) {
-      // Lide com qualquer erro de salvamento de dados aqui
-      print('Erro ao salvar os dados do usuário: $e');
-    }
-  }
-}
+// class UserService {
+//   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+//   final String _collectionName = 'users';
+//   Future<void> saveUserData({
+//     required String uid,
+//     required String name,
+//     required String email,
+//     required String profileImage,
+//     required String bio,
+//     required String Nfollowers,
+//     required String Nrating,
+//     required String Nfollowing,
+//     // required String Nposts,
+//   }) async {
+//     try {
+//       // Crie um documento com o UID do usuário
+//       final DocumentReference userDocRef =
+//           _firestore.collection(_collectionName).doc(uid);
+//       // Salve os dados do usuário no documento
+//       await userDocRef.set({
+//         'name': name,
+//         'email': email,
+//         'profileImage': profileImage,
+//         'bio': bio,
+//         'Nfollowers': Nfollowers,
+//         'Nrating': Nrating,
+//         'Nfollowing': Nfollowing,
+//         // 'Nposts': Nposts,
+//       });
+//     } catch (e) {
+//       // Lide com qualquer erro de salvamento de dados aqui
+//       print('Erro ao salvar os dados do usuário: $e');
+//     }
+//   }
+// }
 
 class FirestoreService {
   final CollectionReference _collection;
@@ -222,4 +224,51 @@ class FirestoreService {
       print('Erro ao apagar dados: $e');
     }
   }
+
+  void setupFirestoreData() async {
+    final userService = FirestoreService('users');
+    final musicService = FirestoreService('music');
+    final playlistService = FirestoreService('playlists');
+    final albumService = FirestoreService('albums');
+    final likeService = FirestoreService('likes');
+
+    await userService.criarDados({
+      'name': 'John Doe',
+      'email': 'johndoe@example.com',
+      'image': 'https://example.com/profile.jpg',
+    });
+
+    await musicService.criarDados({
+      'title': 'Song 1',
+      'artist': 'Artist 1',
+      'duration': '3:45',
+    });
+
+    await playlistService.criarDados({
+      'userId': 'user_id_1',
+      'title': 'My Playlist',
+      'description': 'My favorite songs',
+      'songs': [
+        musicService._collection.doc('music_id_1'),
+        musicService._collection.doc('music_id_2'),
+      ],
+    });
+
+    await albumService.criarDados({
+      'userId': 'user_id_1',
+      'title': 'My Album',
+      'description': 'My awesome album',
+      'songs': [
+        musicService._collection.doc('music_id_3'),
+        musicService._collection.doc('music_id_4'),
+      ],
+    });
+
+    await likeService.criarDados({
+      'userId': 'user_id_1',
+      'playlist': playlistService._collection.doc('playlist_id_1'),
+      'likesCount': 10,
+    });
+  }
+
 }
