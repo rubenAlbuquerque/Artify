@@ -9,6 +9,7 @@ import '../services/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:flutter/scheduler.dart';
 
 import 'dart:io';
 // import 'package:firebase_storage/firebase_storage.dart';
@@ -769,14 +770,17 @@ class _SearchState extends State<SearchPage> {
 
   List<Album> albums = [
     Album(
+      id: "kkkkkkkkkkkkkkkkkkkk1",
       name: "StarBoy 1",
       imageUrl: "assets/images/3.jpg",
     ),
     Album(
+      id: "kkkkkkkkkkkkkkkkkkkk2",
       name: "StarBoy 2",
       imageUrl: "assets/images/background.jpg",
     ),
     Album(
+      id: "kkkkkkkkkkkkkkkkkkkk2",
       name: "StarBoy 3",
       imageUrl: "assets/images/background.jpg",
     ),
@@ -1055,6 +1059,7 @@ class _SearchState extends State<SearchPage> {
                                 builder: (context) =>
                                     // MusicDetailPage(), // AudioPlayerSreen(),
                                     MusicDetailPage(
+                                  musicID: album.id,
                                   title: album.name,
                                   description: "Wizkid",
                                   color: Colors.black,
@@ -1391,21 +1396,26 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
 }
 
 class MusicDetailPage extends StatefulWidget {
+  final String musicID;
   final String title;
   final String description;
   final Color color;
   final String img;
   final String songUrl;
+  // final List<String> likesID;
+  // final int nlikes;
   // detalhes da musica?? tempo, nome, artista, etc
 
-  const MusicDetailPage(
-      {Key? key,
-      required this.title,
-      required this.description,
-      required this.color,
-      required this.img,
-      required this.songUrl})
-      : super(key: key);
+  const MusicDetailPage({
+    Key? key,
+    required this.musicID,
+    required this.title,
+    required this.description,
+    required this.color,
+    required this.img,
+    required this.songUrl,
+    // required this.likesID,
+  }) : super(key: key);
 
   @override
   _MusicDetailPageState createState() => _MusicDetailPageState();
@@ -1437,12 +1447,20 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
     //   print('A duração da música é desconhecida.');
     // }
     initializeAudio();
+
+    // se o user tiver na lista, liske para comecar senao like vazio
+    // getNumLikes()
   }
 
   @override
   void dispose() {
     audioPlayer.dispose();
     super.dispose();
+  }
+
+  int getNumLikes() {
+    // return widget.likesID.length;
+    return 0;
   }
 
   Future<void> initializeAudio() async {
@@ -1597,7 +1615,7 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                           ),
                         ),
                         // Like
-                       
+
                         Material(
                           color: Colors.transparent,
                           child: Align(
@@ -1609,6 +1627,7 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                                   if (mounted) {
                                     setState(() {
                                       isPressed = !isPressed;
+                                      // saveLikeState(isPressed);
                                     });
                                   }
                                 },
@@ -1893,10 +1912,21 @@ class _LibraryPageState extends State<LibraryPage> {
     List<Map<String, dynamic>> fetchedMusicas =
         await authService.getMusicasUser();
 
+    List<Map<String, dynamic>> fetchedPlaylists =
+        await authService.getPlaylistsUser();
+
+    List<Map<String, dynamic>> mergedList = [
+      ...fetchedMusicas,
+      ...fetchedPlaylists
+    ];
+
+    // adicionar filtros e ordem
+    // mergedList.sort((a, b) => a['name'].compareTo(b['name']));
+
     // Faça o processamento dos dados das músicas recebidas (por exemplo, salvar em uma variável do estado para uso na interface)
     if (mounted) {
       setState(() {
-        musicas = fetchedMusicas;
+        musicas = mergedList;
       });
     }
   }
@@ -1945,7 +1975,13 @@ class _LibraryPageState extends State<LibraryPage> {
               size: 30,
             ),
             onPressed: () {
-              // Lógica para o botão de pesquisa
+              // Lógica para o botão de pesquisa -. MySearchLibrary
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MySearchLibrary(),
+                ),
+              );
             },
           ),
           const SizedBox(width: 8),
@@ -2160,7 +2196,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                     5, // Espaçamento entre as colunas
                                 mainAxisSpacing:
                                     5, // Espaçamento entre as linhas
-                                mainAxisExtent: 150, // Altura das linhas
+                                mainAxisExtent: 140, // Altura das linhas
                               ),
                               itemCount: musicas.length,
                               itemBuilder: (BuildContext context, int index) {
@@ -2171,6 +2207,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => MusicDetailPage(
+                                          musicID: data['id'],
                                           title: data['title'],
                                           description: data['description'],
                                           color: Colors.black,
@@ -2181,12 +2218,17 @@ class _LibraryPageState extends State<LibraryPage> {
                                     );
                                   },
                                   child: Container(
+                                    // color: Colors.yellow,
                                     child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         ClipRect(
                                           child: ClipRRect(
                                             borderRadius:
-                                                BorderRadius.circular(8),
+                                                data['type'] == 'playlist'
+                                                    ? BorderRadius.circular(60)
+                                                    : BorderRadius.circular(8),
                                             child: Image.asset(
                                               data['imageUrl'],
                                               fit: BoxFit.cover,
@@ -2199,7 +2241,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                           padding: const EdgeInsets.only(
                                               left: 0.0,
                                               top: 2.0,
-                                              bottom: 1.0,
+                                              bottom: 0.0,
                                               right: 1.0),
                                           child: Text(
                                             data['title'],
@@ -2216,14 +2258,14 @@ class _LibraryPageState extends State<LibraryPage> {
                                         Padding(
                                           padding: const EdgeInsets.only(
                                               left: 0.0,
-                                              top: 2.0,
-                                              bottom: 1.0,
+                                              top: 1.0,
+                                              bottom: 0.0,
                                               right: 1.0),
                                           child: Text(
-                                            data['description'],
+                                            data['description'] ?? '',
                                             style: const TextStyle(
                                               fontSize: 11,
-                                              fontWeight: FontWeight.bold,
+                                              fontWeight: FontWeight.w300,
                                               color: Colors.grey,
                                               // letterSpacing: -0.4,
                                             ),
@@ -2263,6 +2305,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => MusicDetailPage(
+                                            musicID: data['id'],
                                             title: data['title'],
                                             description: data['description'],
                                             color: Colors.black,
@@ -2291,7 +2334,9 @@ class _LibraryPageState extends State<LibraryPage> {
                                         children: [
                                           ClipRRect(
                                             borderRadius:
-                                                BorderRadius.circular(0),
+                                                data['type'] == 'playlist'
+                                                    ? BorderRadius.circular(60)
+                                                    : BorderRadius.circular(8),
                                             child: Image.asset(
                                               data['imageUrl'],
                                               fit: BoxFit.cover,
@@ -2308,16 +2353,17 @@ class _LibraryPageState extends State<LibraryPage> {
                                                 Text(
                                                   data['title'],
                                                   style: const TextStyle(
-                                                    fontSize: 16,
+                                                    fontSize: 15,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
-                                                  data['description'],
+                                                  data['description'] ?? '',
                                                   style: const TextStyle(
-                                                    fontSize: 14,
+                                                    fontSize: 13,
                                                     color: Colors.grey,
+                                                    fontWeight: FontWeight.w300,
                                                   ),
                                                 ),
                                               ],
@@ -2441,6 +2487,726 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 }
 
+// MySearchDelegate
+// class MySearchLibrary extends StatefulWidget {
+//   const MySearchLibrary({Key? key}) : super(key: key);
+
+//   @override
+//   State<MySearchLibrary> createState() => _MySearchLibraryState();
+// }
+
+// class _MySearchLibraryState extends State<MySearchLibrary> {
+//   // Result result = Result('nome', 'type', 'artists', 'coverImg', 'duration');
+//   // Result
+//   static List<Result> dummyResults = [
+//     Result('Ruben', 'Artist', 'Ruben', 'assets/images/background.jpg', '-'),
+//     Result('rui', 'Artist', 'rui', 'assets/images/background.jpg', '-'),
+//     Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+//     Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+//     Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+//     Result('Nome Music 1', 'Music', 'WEb badga', 'assets/images/background.jpg',
+//         '2:10min'),
+//     Result('Nome Music 2', 'Music', 'Red', 'assets/images/background.jpg',
+//         '3:10min'),
+//     Result('Nome Music 3', 'Music', 'Green & Ruben',
+//         'assets/images/background.jpg', '4:10min'),
+//     Result('Nome Music 4', 'Music', 'Blue', 'assets/images/background.jpg',
+//         '5:10min'),
+//     Result('Ruben', 'Artist', 'Ruben', 'assets/images/background.jpg', '-'),
+//     Result('rui', 'Artist', 'rui', 'assets/images/background.jpg', '-'),
+//     Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+//     // Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+//   ];
+//   // https://www.youtube.com/watch?v=jFHSkfjN96I
+
+//   List<Result> display_results = [];
+
+//   void updateList(String value) {
+//     if (mounted) {
+//       setState(() {
+//         display_results = dummyResults
+//             .where((element) =>
+//                 element.nome.toLowerCase().contains(value.toLowerCase()))
+//             .toList();
+//       });
+//     }
+//   }
+
+//   void clearList() {
+//     if (mounted) {
+//       setState(() {
+//         display_results = [];
+//       });
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         bottom: PreferredSize(
+//           preferredSize:
+//               const Size.fromHeight(1.0), // Set the height of the border
+//           child: Container(
+//             decoration: const BoxDecoration(
+//               border: Border(
+//                 bottom: BorderSide(
+//                   color: Color.fromARGB(
+//                       255, 122, 122, 122), // Set the color of the border
+//                   width: 1.0, // Set the width of the border
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//         // toolbarHeight: 120,
+// automaticallyImplyLeading: false,
+// backgroundColor: Colors.transparent,
+// elevation: 0,
+// titleSpacing: 0.0,
+// leading: IconButton(
+//   onPressed: () {
+//     // showSearch(context: context, delegate: CustomSearchDelegate());
+//     Navigator.pop(context);
+//   },
+//   icon: const Icon(
+//     Icons.arrow_back,
+//     color: Colors.black,
+//     // backgroundColor: Colors.red,
+//   ),
+// ),
+//         title: TextField(
+//           onChanged: (value) => updateList(value),
+//           autofocus: true,
+//           style: const TextStyle(
+//             color: Colors.black,
+//             fontSize: 16,
+//             // remove the underline
+//             decoration: TextDecoration.none,
+//             fontWeight: FontWeight.bold,
+//           ),
+//           decoration: const InputDecoration(
+//             border: InputBorder.none,
+//             focusedBorder: InputBorder.none,
+//             enabledBorder: InputBorder.none,
+//             errorBorder: InputBorder.none,
+//             disabledBorder: InputBorder.none,
+//             // filled: true,
+//             // fillColor: Color.fromARGB(255, 187, 22, 22),
+//             // border: InputBorder.none,
+//             hintText: 'O que queres ouvir?',
+//             hintStyle: TextStyle(
+//               color: Colors.black,
+//               fontSize: 16,
+//               // bold
+//               fontWeight: FontWeight.bold,
+//             ),
+//             // border: InputBorder.none,
+//             // prefixIcon: Icon(Icons.arrow_back, color: Colors.black),
+//             // prefixIconConstraints: BoxConstraints(
+//             //   minWidth: 50,
+//             //   minHeight: 50,
+//             // ),
+//             // border: OutlineInputBorder(
+//             //   borderRadius: BorderRadius.all(Radius.circular(8.0)),
+//             //   borderSide: BorderSide.none,
+//             //   // borderSide: BorderSide(
+//             //   //   color: Color.fromARGB(0, 16, 16, 16),
+//             //   //   width: 1,
+//             //   // ),
+//             // ),
+//             // suffixIcon: IconButton(
+//             //   onPressed: () {
+//             //     // showSearch(context: context, delegate: CustomSearchDelegate());
+//             //   },
+//             //   icon: const Icon(Icons.clear, color: Colors.black),
+//             // ),
+//           ),
+//         ),
+//         actions: [
+//           IconButton(
+//             onPressed: () {
+//               // showSearch(context: context, delegate: CustomSearchDelegate());
+//               // clear the search
+//               clearList();
+//               // updateList('');
+//             },
+//             icon: const Icon(Icons.clear, color: Colors.black),
+//           ),
+//         ],
+//       ),
+//       body: Column(
+//         children: [
+//           const SizedBox(
+//             height: 5.0,
+//           ),
+//           Expanded(
+//             child: display_results.length == 0
+//                 ? const Center(
+//                     child: Text('No results Found',
+//                         style: TextStyle(
+//                           color: Colors.black,
+//                           fontWeight: FontWeight.bold,
+//                           fontSize: 22,
+//                           // backgroundColor: Colors.red,
+//                           // print('No results Found'),
+//                         )),
+//                   )
+//                 : ListView.builder(
+//                     itemCount: display_results.length,
+//                     itemBuilder: (context, index) => ListTile(
+//                       // backgroundColor: Colors.black,
+//                       contentPadding: const EdgeInsets.symmetric(
+//                           horizontal: 10.0, vertical: 0.0),
+//                       onTap: () {
+//                         // Navigator.push(
+//                         //   context,
+//                         //   MaterialPageRoute(
+//                         //     builder: (context) => MusicPlayer(),
+//                         //   ),
+//                         // );
+//                       },
+//                       title: Text(display_results[index].nome,
+//                           style: const TextStyle(
+//                             color: Colors.black,
+//                             fontWeight: FontWeight.bold,
+//                             fontSize: 14,
+//                           )),
+//                       subtitle: Text(
+//                           '${display_results[index].nome} : ${display_results[index].artist}',
+//                           style: const TextStyle(
+//                             color: Colors.black87,
+//                             // backgroundColor: Colors.black,
+//                             // fontWeight: FontWeight.bold,
+//                             fontSize: 12,
+//                           )),
+//                       // trailing: Text(display_results[index].duration,
+//                       // style: const TextStyle(
+//                       // color: Colors.black87,
+//                       // fontWeight: FontWeight.bold,
+//                       //  )),
+//                       leading: Image(
+//                         image: AssetImage(display_results[index].coverImg),
+//                         // image: AssetImage('assets/icons/google.png'),
+//                         fit: BoxFit.cover,
+//                         height: 60,
+//                         width: 60,
+//                         // color: Colors.black,
+//                         // colorBlendMode: BlendMode.darken,
+
+//                         // For asset images
+//                       ),
+//                     ),
+//                   ),
+//           )
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// / / / / / / / / / / / / / / / / / / / /
+
+class MySearchLibrary extends StatefulWidget {
+  const MySearchLibrary({Key? key}) : super(key: key);
+  @override
+  _MySearchLibraryState createState() => _MySearchLibraryState();
+}
+
+// class _MySearchLibraryState extends State<MySearchLibrary> {
+//   String _searchText = '';
+//   List<String> _searchResults = [];
+
+//   void _performSearch() {
+//     // Aqui você pode implementar a lógica para enviar uma solicitação de pesquisa
+//     // com o texto digitado na barra de pesquisa (_searchText).
+//     // Por enquanto, vamos apenas simular uma lista de resultados.
+//     setState(() {
+//       _searchResults = [
+//         // firebase
+//         'Resultado 1',
+//         'Resultado 2',
+//         'Resultado 3',
+//       ];
+//     });
+//   }
+
+//   void _applyFilter(String filter) {
+//     setState(() {
+//       // Aqui você pode implementar a lógica para aplicar o filtro selecionado aos resultados da pesquisa.
+//       // Por enquanto, vamos apenas filtrar os resultados simulados com base no filtro selecionado.
+//       _searchResults =
+//           _searchResults.where((result) => result.contains(filter)).toList();
+//     });
+//   }
+
+//   void _updateSearchResults(String searchText) {
+//     setState(() {
+//       if (searchText.isEmpty) {
+//         // Se a barra de pesquisa estiver vazia, exiba todos os resultados
+//         _searchResults = [
+//           'Resultado 1',
+//           'Resultado 2',
+//           'Resultado 3',
+//         ];
+//       } else {
+//         // Caso contrário, filtre os resultados com base no texto da pesquisa
+//         _searchResults = _searchResults
+//             .where((result) => result.contains(searchText))
+//             .toList();
+//       }
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         automaticallyImplyLeading: false,
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//         titleSpacing: 0.0,
+//         leading: IconButton(
+//           onPressed: () {
+//             // showSearch(context: context, delegate: CustomSearchDelegate());
+//             Navigator.pop(context);
+//           },
+//           icon: const Icon(
+//             Icons.arrow_back,
+//             color: Colors.black,
+//             // backgroundColor: Colors.red,
+//           ),
+//         ),
+//         title: TextField(
+//           onChanged: (value) {
+//             if (mounted) {
+//               setState(() {
+//                 _searchText = value;
+//                 _updateSearchResults(_searchText);
+//               });
+//             }
+//           },
+//           onSubmitted: (value) {
+//             _performSearch();
+//           },
+//           autofocus: true,
+//           decoration: InputDecoration(
+//             hintText: 'Search on your library...',
+//             suffixIcon: IconButton(
+//               onPressed: () {
+//                 setState(() {
+//                   _searchText = '';
+//                   _updateSearchResults(_searchText);
+//                 });
+//               },
+//               icon: const Icon(
+//                 Icons.clear,
+//                 color: Colors.black,
+//               ),
+//             ),
+//           ),
+//         ),
+//         // actions: [
+//         //   IconButton(
+//         //     onPressed: () {
+//         //       // clear the search
+//         //       setState(() {
+//         //         _searchText = '';
+//         //         _updateSearchResults(_searchText);
+//         //       });
+//         //     },
+//         //     icon: const Icon(
+//         //       Icons.clear,
+//         //       color: Colors.black,
+//         //     ),
+//         //   ),
+//         // ],
+//       ),
+//       body: Column(
+//         children: [
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//             children: [
+//               ElevatedButton(
+//                 onPressed: () {
+//                   // Aplicar filtro de músicas
+//                   _applyFilter('Musics');
+//                 },
+//                 child: Text('Musics'),
+//               ),
+//               ElevatedButton(
+//                 onPressed: () {
+//                   // Aplicar filtro de playlists
+//                   _applyFilter('Playlists');
+//                 },
+//                 child: Text('Playlists'),
+//               ),
+//               ElevatedButton(
+//                 onPressed: () {
+//                   // Aplicar filtro de artistas
+//                   _applyFilter('Artists');
+//                 },
+//                 child: Text('Artists'),
+//               ),
+//               ElevatedButton(
+//                 onPressed: () {
+//                   // Aplicar filtro de álbuns
+//                   _applyFilter('Albums');
+//                 },
+//                 child: Text('Albums'),
+//               ),
+//             ],
+//           ),
+//           Expanded(
+//             child: ListView.builder(
+//               itemCount: _searchResults.length,
+//               itemBuilder: (context, index) {
+//                 final result = _searchResults[index];
+//                 return ListTile(
+//                   title: Text(result),
+//                 );
+//               },
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// import 'package:flutter/material.dart';
+
+class _MySearchLibraryState extends State<MySearchLibrary> {
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, String>> _searchResults = [];
+  bool _isSearching = false;
+  // varivel de filto
+  // String _filter = '';
+
+  void _performSearch(String searchText) {
+    setState(() {
+      _isSearching = true;
+    });
+
+    Future.delayed(const Duration(seconds: 1), () {
+      AuthService().searchtermLibrary(searchText).then((results) {
+        setState(() {
+          _searchResults = results;
+          _isSearching = false;
+        });
+      });
+
+      // setState(() {
+      //   // _searchResults = allResults;
+      //   _searchResults = [
+      //     'Resultado 1',
+      //     'Resultado 2',
+      //     'Resultado 3',
+      //   ];
+      //   _isSearching = false;
+      // });
+    });
+  }
+
+  // void _applyFilter(String filter) {
+  //   setState(() {
+  //     _searchResults = _searchResults
+  //         .where(
+  //             (result) => result.toLowerCase().contains(filter.toLowerCase()))
+  //         .toList();
+  //   });
+  // }
+
+  void _updateSearchResults(String searchText) {
+    if (searchText.isEmpty) {
+      setState(() {
+        _searchResults = [];
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+    });
+
+    if (_searchDebouncer != null && _searchDebouncer!.isActive) {
+      _searchDebouncer!.cancel();
+    }
+
+    _searchDebouncer = Timer(Duration(milliseconds: 300), () {
+      _performSearch(searchText); // searchText
+    });
+  }
+
+  // Widget getImage(String imageUrl) {
+  //   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+  //     return Image.network(imageUrl);
+  //   } else {
+  //     try {
+  //       return Image.asset(imageUrl);
+  //     } catch (e) {
+  //       print('Error loading image: $e');
+  //       return Container(
+  //         width: 50,
+  //         height: 50,
+  //         color: Colors.grey,
+  //         child: const Icon(
+  //           Icons.image_not_supported,
+  //           color: Colors.white,
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
+
+  Widget getImage(String imageUrl) {
+    // print("Image URL: " + imageUrl);
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      print("Image URL: ruben");
+      try {
+        print(imageUrl.startsWith('http://'));
+        return Container(
+          width: 70, // Defina a largura desejada
+          height: 130, // Defina a altura desejada
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit
+                .cover, // Ajuste o modo de ajuste da imagem (cover, contain, etc.)
+          ),
+        );
+      } catch (e) {
+        print('Error loading image: $e');
+        return Container(
+          width: 50,
+          height: 50,
+          color: Colors.grey,
+          child: const Icon(
+            Icons.image_not_supported,
+            color: Colors.white,
+          ),
+        );
+      }
+    } else {
+      try {
+        return Container(
+          width: 70, // Defina a largura desejada
+          height: 130, // Defina a altura desejada
+          child: Image.asset(
+            imageUrl,
+            fit: BoxFit
+                .cover, // Ajuste o modo de ajuste da imagem (cover, contain, etc.)
+          ),
+        );
+      } catch (e) {
+        print('Error loading image: $e');
+        return Container(
+          width: 50,
+          height: 50,
+          color: Colors.grey,
+          child: const Icon(
+            Icons.image_not_supported,
+            color: Colors.white,
+          ),
+        );
+      }
+    }
+  }
+
+  Timer? _searchDebouncer;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchDebouncer?.cancel();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        bottom: PreferredSize(
+          preferredSize:
+              const Size.fromHeight(1.0), // Set the height of the border
+          child: Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Color.fromARGB(
+                      255, 122, 122, 122), // Set the color of the border
+                  width: 1.0, // Set the width of the border
+                ),
+              ),
+            ),
+          ),
+        ),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        titleSpacing: 0.0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
+        ),
+        title: TextField(
+          controller: _searchController,
+          onChanged: (value) {
+            _updateSearchResults(value);
+          },
+          onSubmitted: (value) {
+            _performSearch(value);
+          },
+          autofocus: true,
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+            // remove the underline
+
+            decoration: TextDecoration.none,
+            fontWeight: FontWeight.bold,
+          ),
+          decoration: InputDecoration(
+            // filled: true,
+            // fillColor: Colors.grey[600], // Cor de fundo
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+            hintText: 'Search on your library...',
+            contentPadding: EdgeInsets.symmetric(vertical: 14.0),
+            suffixIcon: IconButton(
+              onPressed: () {
+                setState(() {
+                  _searchController.clear();
+                  _updateSearchResults('');
+                });
+              },
+              icon: const Icon(
+                Icons.clear,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: _isSearching
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : _searchResults.isEmpty
+                    ? _searchController.text.isEmpty
+                        ? const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Encontra os teus preferidos",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  "Procura tudo: artistas, musicas e playlists",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  // color: Colors.amber,
+                                  constraints: const BoxConstraints(
+                                    maxWidth:
+                                        270, // Defina o tamanho máximo de largura desejado
+                                  ),
+                                  child: Text(
+                                    "Could not find any results of '${_searchController.text.isNotEmpty ? _searchController.text + "'" : "' your search"}",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  // color: Colors.blue,
+                                  constraints: const BoxConstraints(
+                                    maxWidth:
+                                        270, // Defina o tamanho máximo de largura desejado
+                                  ),
+                                  child: const Text(
+                                    // central text
+
+                                    "Try searching again with a different \nterm or keyword",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                    : ListView.builder(
+                        itemCount: _searchResults.length,
+                        itemBuilder: (context, index) {
+                          final result = _searchResults[index];
+                          return ListTile(
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 3.0, horizontal: 16.0),
+                            leading: getImage(result['image'] ?? ''),
+                            //Image.network(result['image'] ?? ''),
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  result['title'] ?? 'title default',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  result['type'] ?? 'type default',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// / / / / / / / / / / / / / / / / / / / /
+
 class NewPlaylistPage extends StatefulWidget {
   const NewPlaylistPage({Key? key}) : super(key: key);
 
@@ -2519,6 +3285,10 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
             TextButton(
               onPressed: () {
                 // Lógica a ser executada quando o botão "OK" for pressionado
+                final playlistName = playlistController.text;
+                AuthService()
+                    .createPlaylist(playlistName, "Other", "playlistImage");
+
                 Navigator.pop(context);
                 Navigator.pop(context);
               },
@@ -2662,9 +3432,6 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
                           child: ElevatedButton(
                             onPressed: () {
                               // Lógica para Criar (aaddicionar playlist)
-                              final playlistName = playlistController.text;
-                              AuthService().createPlaylist(
-                                  playlistName, "Other", "playlistImage");
 
                               showAlert();
 
@@ -3476,33 +4243,34 @@ class _ProfilePageState extends State<ProfilePage> {
                                         // onPressed:
                                         // isEditing ? saveChanges : () {},
                                         onPressed: () {
-                                          if (mounted) {
-                                            // setState(() {
-                                            // isEditing = !isEditing;
-                                            // if (isEditing) {
-                                            //   FocusScope.of(context)
-                                            //       .requestFocus(bioFocusNode);
-                                            // }
-                                            if (isEditing) {
-                                              String newBio =
-                                                  bioController.text;
-                                              AuthService().updateBio(newBio);
+                                          // setState(() {
+                                          // isEditing = !isEditing;
+                                          // if (isEditing) {
+                                          //   FocusScope.of(context)
+                                          //       .requestFocus(bioFocusNode);
+                                          // }
+                                          if (isEditing) {
+                                            String newBio = bioController.text;
+                                            AuthService().updateBio(newBio);
 
-                                              // Atualize o valor da variável bio
+                                            if (mounted) {
                                               setState(() {
                                                 bio = newBio;
                                                 isEditing = false;
                                               });
-                                            } else {
+                                            }
+                                          } else {
+                                            if (mounted) {
                                               setState(() {
                                                 isEditing = true;
                                               });
-                                              FocusScope.of(context)
-                                                  .requestFocus(bioFocusNode);
                                             }
-                                            // }
-                                            // );
+
+                                            FocusScope.of(context)
+                                                .requestFocus(bioFocusNode);
                                           }
+                                          // }
+                                          // );
                                         },
                                         style: ElevatedButton.styleFrom(
                                           primary: Colors
@@ -3617,6 +4385,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => MusicDetailPage(
+                                            musicID: data['id'],
                                             title: data['title'],
                                             description: data['description'],
                                             color: Colors.black,

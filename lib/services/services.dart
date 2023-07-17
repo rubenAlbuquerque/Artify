@@ -268,20 +268,98 @@ class AuthService {
   }
 
   // Obter todas as músicas do usuário
+  // Future<List<Map<String, dynamic>>> getMusicasUser() async {
+  //   // List<Map<String, dynamic>> musicas = [];
+  //   // String userId = auth.currentUser!.uid;
+  //   // QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  //   //     .collection('music')
+  //   //     // .where('userId', isEqualTo: userId)
+  //   //     .get();
+  //   // querySnapshot.docs.forEach((doc) {
+  //   //   Map<String, dynamic> musica = doc.data() as Map<String, dynamic>;
+  //   //   musicas.add(musica);
+  //   // });
+  //   // // ver a lista
+  //   // print(musicas);
+  //   // return musicas;
+  //   List<Map<String, dynamic>> musicas = [];
+  //   String userId = auth.currentUser!.uid;
+  //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  //       .collection('playlists')
+  //       .where('userId', isEqualTo: userId)
+  //       .where('type', isEqualTo: 'Perfil')
+  //       .get();
+  //   // querySnapshot.docs.forEach((doc) {
+  //   //   Map<String, dynamic> musica = doc.data() as Map<String, dynamic>;
+  //   //   // musicas.add(musica);
+  //   //   // utilizar o array songs da playlist que contem as referencias para obter uma lista com as informacoes das musicas
+  //   // });
+  //   querySnapshot.docs.forEach((doc) async {
+  //     Map<String, dynamic> playlistData = doc.data() as Map<String, dynamic>;
+  //     List<DocumentReference> songs = List<DocumentReference>.from(playlistData[
+  //         'songs']); // Obtém o array de referências 'songs' da playlist
+  //     for (DocumentReference songRef in songs) {
+  //       // Obtém o documento da música
+  //       DocumentSnapshot songSnapshot = await songRef.get();
+  //       if (songSnapshot.exists) {
+  //         Map<String, dynamic> musica =
+  //             songSnapshot.data() as Map<String, dynamic>;
+  //         musicas.add(musica);
+  //       }
+  //     }
+  //   });
+  //   return musicas;
+  // }
+
   Future<List<Map<String, dynamic>>> getMusicasUser() async {
     List<Map<String, dynamic>> musicas = [];
     String userId = auth.currentUser!.uid;
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('music')
-        // .where('userId', isEqualTo: userId)
+        .collection('playlists')
+        .where('userId', isEqualTo: userId)
+        .where('type', isEqualTo: 'Perfil')
         .get();
-    querySnapshot.docs.forEach((doc) {
-      Map<String, dynamic> musica = doc.data() as Map<String, dynamic>;
-      musicas.add(musica);
-    });
-    // ver a lista
-    print(musicas);
+
+    for (DocumentSnapshot doc in querySnapshot.docs) {
+      Map<String, dynamic> playlistData = doc.data() as Map<String, dynamic>;
+      List<DocumentReference> songs = List<DocumentReference>.from(playlistData[
+          'songs']); // Obtém o array de referências 'songs' da playlist
+
+      for (DocumentReference songRef in songs) {
+        // Obtém o documento da música
+        DocumentSnapshot songSnapshot = await songRef.get();
+
+        if (songSnapshot.exists) {
+          Map<String, dynamic> musica =
+              songSnapshot.data() as Map<String, dynamic>;
+          musicas.add(musica);
+        }
+      }
+    }
+
     return musicas;
+  }
+
+  // getPlaylistsUser
+  Future<List<Map<String, dynamic>>> getPlaylistsUser() async {
+    List<Map<String, dynamic>> playlists = [];
+    String userId = auth.currentUser!.uid;
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('playlists')
+        .where('userId', isEqualTo: userId)
+        .where('where', isEqualTo: 'library')
+        .get();
+
+    for (DocumentSnapshot doc in querySnapshot.docs) {
+      Map<String, dynamic> playlistData = doc.data() as Map<String, dynamic>;
+      playlists.add(playlistData);
+    }
+    // imageUrl: assets/images/Capturar1.jpg
+    // title: "shshsbs"
+    // type : "Library"
+    // userId: "Kd3NnCFzSvR81CP8Uc4Ob9HUQpi2"
+
+    return playlists;
   }
 
   // Obter todas as músicas do usuário
@@ -406,7 +484,6 @@ class AuthService {
 
   // Future<String?> pickImage() async {
   //   final result = await FilePicker.platform.pickFiles(type: FileType.image);
-
   //   if (result != null && result.files.isNotEmpty) {
   //     final file = File(result.files.first.path!);
   //     // Aqui você pode adicionar lógica para fazer o upload da imagem para o Firebase Storage
@@ -417,13 +494,212 @@ class AuthService {
   //     final uploadTask = storageRef.putFile(file);
   //     final snapshot = await uploadTask.whenComplete(() {});
   //     final imageUrl = await snapshot.ref.getDownloadURL();
-
   //     return imageUrl;
   //   } else {
   //     return null;
   //   }
   // }
+
+  // Future<void> searchterm(String term) async {
+
+  //   final musicService = FirestoreService('music');
+  //   final playlist = FirestoreService('playlists');
+  //   final users = FirestoreService('users');
+
+  //   // procurar em todas as colecoes o ducumento com comece pelo term
+  //   final QuerySnapshot querySnapshot = await musicService._collection
+  //       .where('title', isGreaterThanOrEqualTo: term)
+  //       .get();
+
+  //   final QuerySnapshot querySnapshot2 = await playlist._collection
+  //       .where('title', isGreaterThanOrEqualTo: term)
+  //       .get();
+
+  //   final QuerySnapshot querySnapshot3 = await users._collection
+  //       .where('name', isGreaterThanOrEqualTo: term)
+  //       .get();
+
+  //   final List<DocumentSnapshot> musicResults = querySnapshot.docs
+  //       .where((doc) => doc['title'].startsWith(term))
+  //       .toList();
+
+  //   final List<DocumentSnapshot> playlistResults = querySnapshot2.docs
+  //       .where((doc) => doc['title'].startsWith(term))
+  //       .toList();
+
+  //   final List<DocumentSnapshot> usersResults = querySnapshot3.docs
+  //       .where((doc) => doc['name'].startsWith(term))
+  //       .toList();
+
+  //   // Combine os resultados de todas as coleções
+  //   final allResults = [...musicResults, ...playlistResults, ...usersResults];
+
+  //  return allResults;
+
+  // }
+
+  Future<List<Map<String, String>>> searchterm(String term) async {
+    final musicService = FirestoreService('music');
+    final playlist = FirestoreService('playlists');
+    final users = FirestoreService('users');
+
+    final QuerySnapshot querySnapshot = await musicService._collection
+        .where('title', isGreaterThanOrEqualTo: term)
+        .get();
+
+    final QuerySnapshot querySnapshot2 = await playlist._collection
+        .where('title', isGreaterThanOrEqualTo: term)
+        .get();
+
+    final QuerySnapshot querySnapshot3 = await users._collection
+        .where('name', isGreaterThanOrEqualTo: term)
+        .get();
+
+    final List<DocumentSnapshot> musicResults = querySnapshot.docs
+        .where((doc) => doc['title'].startsWith(term))
+        .toList();
+
+    final List<DocumentSnapshot> playlistResults = querySnapshot2.docs
+        .where((doc) => doc['title'].startsWith(term))
+        .toList();
+
+    final List<DocumentSnapshot> usersResults = querySnapshot3.docs
+        .where((doc) => doc['name'].startsWith(term))
+        .toList();
+
+    // final allResults = [
+    //   ...musicResults.map((doc) => doc['title'] as String),
+    //   ...playlistResults.map((doc) => doc['title'] as String),
+    //   ...usersResults.map((doc) => doc['name'] as String),
+    // ];assets/images/3.jpg
+
+    final List<Map<String, String>> allResults = [
+      ...musicResults.map((doc) => {
+            'title': doc['title'] as String,
+            'type': 'music',
+            'image': doc['imageUrl'] as String,
+          }),
+      ...playlistResults.map((doc) => {
+            'title': doc['title'] as String,
+            'type': 'playlist',
+            'image': doc['imageUrl'] as String,
+          }),
+      ...usersResults.map((doc) => {
+            'title': doc['name'] as String,
+            'type': 'Artist',
+            'image': doc['image'] as String,
+          }),
+    ];
+
+    return allResults;
+  }
+
+  // Future<List<Map<String, String>>> searchtermLibrary(String term) async {
+  //   final playlist = FirestoreService('playlists');
+  //   final musicService = FirestoreService('music');
+  //   final QuerySnapshot playlistQuerySnapshot = await playlist._collection
+  //       .where('type', isEqualTo: 'library')
+  //       // .where('title', isGreaterThanOrEqualTo: term)
+  //       .get();
+  //   // obter as infos das musicas na playlist
+  //   // final List<DocumentSnapshot> playlistResults = querySnapshot2.docs
+  //   //     .where((doc) => doc['title'].startsWith(term))
+  //   //     .toList();
+  //   final List<Map<String, String>> allResults = [];
+  //   if (playlistQuerySnapshot.docs.isNotEmpty) {
+  //     final playlistDoc = playlistQuerySnapshot.docs[0];
+  //     final playlistId = playlistDoc.id;
+  //     final List<dynamic> musicReferences =
+  //         playlistDoc['songs'] as List<dynamic>;
+  //     final List<String> musicIds = [];
+  //     for (final reference in musicReferences) {
+  //       final String musicId = reference.id;
+  //       musicIds.add(musicId);
+  //     }
+  //     final QuerySnapshot musicQuerySnapshot = await musicService._collection
+  //         .where('id', whereIn: musicIds)
+  //         // .where('title', isGreaterThanOrEqualTo: term)
+  //         .get();
+  //     final List<Map<String, String>> filteredResults = [];
+  //     for (final musicDoc in musicQuerySnapshot.docs) {
+  //       final musicTitle = musicDoc['title'] as String;
+  //       final musicImage = musicDoc['image'] as String;
+  //       if (musicTitle.startsWith(term)) {
+  //         final result = {
+  //           'playlistId': playlistId,
+  //           'musicTitle': musicTitle,
+  //           'musicImage': musicImage,
+  //         };
+  //         filteredResults.add(result);
+  //       }
+  //     }
+  //     return filteredResults;
+  //   }
+  // }
+
+  Future<List<Map<String, String>>> searchtermLibrary(String term) async {
+    final playlist = FirestoreService('playlists');
+    final musicService = FirestoreService('music');
+
+    final QuerySnapshot playlistQuerySnapshot =
+        await playlist._collection.where('type', isEqualTo: 'library').get();
+
+    final List<Map<String, String>> allResults = [];
+
+    if (playlistQuerySnapshot.docs.isNotEmpty) {
+      final playlistDoc = playlistQuerySnapshot.docs[0];
+      final playlistId = playlistDoc.id;
+
+      final List<dynamic> musicReferences =
+          playlistDoc['songs'] as List<dynamic>;
+
+      final List<String> musicIds = [];
+
+      for (final reference in musicReferences) {
+        final String musicId = reference.id;
+        musicIds.add(musicId);
+      }
+
+      // final QuerySnapshot musicQuerySnapshot =
+      //     await musicService._collection.whereIn('id', musicIds).get();
+
+      final QuerySnapshot musicQuerySnapshot = await musicService._collection
+          // .where('id', whereIn: musicIds)
+          // .where('title', isGreaterThanOrEqualTo: term)
+          .get();
+
+      for (final musicDoc in musicQuerySnapshot.docs) {
+        final musicId = musicDoc.id;
+        final musicData = musicDoc.data() as Map<String, dynamic>?;
+
+        if (musicData != null) {
+          final musicTitle = musicData['title'] as String?;
+          final musicImage = musicData['imageUrl'] as String?;
+
+          if (musicTitle != null && musicImage != null) {
+            if (musicIds.contains(musicId)) {
+              print('musicId: $musicId');
+              print('musicTitle: $musicTitle');
+              print('musicImage: $musicImage');
+
+              final result = {
+                'playlistId': playlistId,
+                'musicId': musicId,
+                'musicTitle': musicTitle,
+                'musicImage': musicImage,
+              };
+
+              allResults.add(result);
+            }
+          }
+        }
+      }
+    }
+
+    return allResults;
+  }
 }
+
 
 // Classe to save the user data in the database firebase
 // class User {
@@ -505,3 +781,4 @@ class AuthService {
 //     }
 //   }
 // }
+
