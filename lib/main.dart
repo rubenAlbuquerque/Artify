@@ -1,4 +1,5 @@
 // import 'package:artify/screens/search_page.dart';
+import 'package:artify/services/services.dart';
 import 'package:flutter/material.dart';
 // import 'dart:io';
 // import 'package:flutter/cupertino.dart';
@@ -24,17 +25,23 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
+  final AuthService authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
+    bool isUserLoggedIn =
+        authService.isUserSignedIn(); // Verificar se o usuário está logado
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Meu App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/login',
+      initialRoute: isUserLoggedIn
+          ? '/home'
+          : '/login', // Definir a rota inicial com base no login
       routes: {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
@@ -45,6 +52,34 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({Key? key}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     bool isUserLoggedIn = AuthService().isUserSignedIn(); // Verificar se o usuário está logado
+
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       title: 'Meu App',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       initialRoute: isUserLoggedIn
+//           ? '/home'
+//           : '/login', // Definir a rota inicial com base no login
+//       routes: {
+//         '/login': (context) => const LoginPage(),
+//         '/home': (context) => const HomePage(),
+//         '/search': (context) => const SearchPage(),
+//         '/library': (context) => const LibraryPage(),
+//         '/profile': (context) => const ProfilePage(),
+//       },
+//     );
+//   }
+// }
+
 
 // class LoginPage extends StatelessWidget {
 //   const LoginPage({Key? key}) : super(key: key);

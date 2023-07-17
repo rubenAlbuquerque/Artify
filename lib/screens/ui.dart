@@ -8,6 +8,12 @@ import '../services/services.dart';
 // import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:quickalert/quickalert.dart';
+
+import 'dart:io';
+// import 'package:firebase_storage/firebase_storage.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -379,6 +385,12 @@ class _HomeState extends State<HomePage> {
             icon: const Icon(Icons.upload, color: Colors.black),
             onPressed: () {
               // Lógica para o botão de upload
+              // UploadPage
+              // Navigator.pushReplacementNamed(context, '/upload');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UploadPage()),
+              );
             },
           ),
           IconButton(
@@ -619,6 +631,130 @@ class _HomeState extends State<HomePage> {
   }
 }
 
+//
+
+class UploadPage extends StatefulWidget {
+  @override
+  _UploadPageState createState() => _UploadPageState();
+}
+
+class _UploadPageState extends State<UploadPage> {
+  File? _imageFile;
+  File? _audioFile;
+
+  // Reference to Firebase Storage
+  // final FirebaseStorage _storage = FirebaseStorage.instance;
+
+  // // Reference to Firebase Firestore
+  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // // Uploads the image file to Firebase Storage
+  // Future<String> _uploadImage(File imageFile) async {
+  //   String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+  //   Reference storageRef = _storage.ref().child('images/$fileName.jpg');
+  //   UploadTask uploadTask = storageRef.putFile(imageFile);
+  //   TaskSnapshot snapshot = await uploadTask;
+  //   String imageUrl = await snapshot.ref.getDownloadURL();
+  //   return imageUrl;
+  // }
+
+  // // Uploads the audio file to Firebase Firestore
+  // Future<void> _uploadAudio(String imageUrl, String audioUrl) async {
+  //   await _firestore.collection('music').add({
+  //     'image': imageUrl,
+  //     'audio': audioUrl,
+  //   });
+  // }
+
+  // Handles the image selection
+  void _pickImage() async {
+    //   // Code for selecting an image from the device's gallery
+    //   // ...
+
+    //   // After selecting the image
+    //   setState(() {
+    //     _imageFile = selectedImageFile;
+    //   });
+    String title = 'Song Title';
+    String imageUrl = 'https://example.com/song_image.jpg';
+    String description = 'A great song';
+    int likes = 0;
+
+    AuthService().uploadMusic(title, imageUrl, description, likes);
+    print('Music uploaded successfully');
+  }
+
+  // Handles the audio selection
+  // void _pickAudio() async {
+  //   // Code for selecting an audio file from the device's storage
+  //   // ...
+
+  //   // After selecting the audio file
+  //   setState(() {
+  //     _audioFile = selectedAudioFile;
+  //   });
+  // }
+
+  // Handles the upload button press
+  // void _handleUpload() async {
+  //   if (_imageFile != null && _audioFile != null) {
+  //     // Upload image to Firebase Storage
+  //     String imageUrl = await _uploadImage(_imageFile!);
+
+  //     // Upload audio to Firebase Firestore
+  //     String audioUrl = _audioFile!.path; // Placeholder for audio upload logic
+
+  //     await _uploadAudio(imageUrl, audioUrl);
+
+  //     // Clear selected files
+  //     setState(() {
+  //       _imageFile = null;
+  //       _audioFile = null;
+  //     });
+
+  //     // Show success message
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Upload completed successfully')),
+  //     );
+  //   } else {
+  //     // Show error message if files are not selected
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Please select an image and an audio file')),
+  //     );
+  //   }
+  // }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Upload Page'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: _pickImage,
+              child: Text('Select Image'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _pickImage, //_pickAudio,
+              child: Text('Select Audio'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _pickImage, //_handleUpload,
+              child: Text('Upload'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
 
@@ -658,9 +794,11 @@ class _SearchState extends State<SearchPage> {
     //         album.name.toLowerCase().contains(searchTerm.toLowerCase()))
     //     .toList();
 
-    setState(() {
-      // results = filteredList;
-    });
+    if (mounted) {
+      setState(() {
+        // results = filteredList;
+      });
+    }
   }
 
   late Timer timer;
@@ -1068,18 +1206,22 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
   List<Result> display_results = [];
 
   void updateList(String value) {
-    setState(() {
-      display_results = dummyResults
-          .where((element) =>
-              element.nome.toLowerCase().contains(value.toLowerCase()))
-          .toList();
-    });
+    if (mounted) {
+      setState(() {
+        display_results = dummyResults
+            .where((element) =>
+                element.nome.toLowerCase().contains(value.toLowerCase()))
+            .toList();
+      });
+    }
   }
 
   void clearList() {
-    setState(() {
-      display_results = [];
-    });
+    if (mounted) {
+      setState(() {
+        display_results = [];
+      });
+    }
   }
 
   @override
@@ -1307,18 +1449,22 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
     await audioPlayer.setAsset(widget.songUrl);
 
     audioPlayer.durationStream.listen((d) {
-      setState(() {
-        duration = d;
-        final durationInSeconds = duration!.inSeconds;
-        minutes = durationInSeconds ~/ 60;
-        seconds = durationInSeconds % 60;
-      });
+      if (mounted) {
+        setState(() {
+          duration = d;
+          final durationInSeconds = duration!.inSeconds;
+          minutes = durationInSeconds ~/ 60;
+          seconds = durationInSeconds % 60;
+        });
+      }
     });
 
     audioPlayer.positionStream.listen((p) {
-      setState(() {
-        _value = p.inSeconds.toDouble();
-      });
+      if (mounted) {
+        setState(() {
+          _value = p.inSeconds.toDouble();
+        });
+      }
     });
     await audioPlayer.play();
   }
@@ -1451,36 +1597,7 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                           ),
                         ),
                         // Like
-                        // Material(
-                        //   color: Colors.transparent,
-                        //   // child: Ink( shuffle, skip_back, controller_stop e play skip_forward e retweet
-                        //   child: Align(
-                        //     alignment: Alignment.center,
-                        //     child: Padding(
-                        //       padding: const EdgeInsets.only(
-                        //           right: 0,
-                        //           top: 0,
-                        //           bottom: 0,
-                        //           left:
-                        //               0), // Adjust the padding values as needed
-                        //       child: IconButton(
-                        //         onPressed: () {
-                        //           setState(() {
-                        //             isPressed = !isPressed;
-                        //             // print(isPressed);
-                        //           });
-                        //         },
-                        //         iconSize: 35,
-                        //         icon: Icon(
-                        //           isPressed
-                        //               ? Icons.favorite
-                        //               : Icons.favorite_border,
-                        //           color: isPressed ? Colors.red : Colors.black,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
+                       
                         Material(
                           color: Colors.transparent,
                           child: Align(
@@ -1489,9 +1606,11 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                               padding: const EdgeInsets.only(left: 0),
                               child: TextButton(
                                 onPressed: () {
-                                  setState(() {
-                                    isPressed = !isPressed;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      isPressed = !isPressed;
+                                    });
+                                  }
                                 },
                                 style: ButtonStyle(
                                   padding: MaterialStateProperty.all<
@@ -1571,10 +1690,13 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                             ? duration!.inSeconds.toDouble()
                             : 0,
                         onChanged: (double value) {
-                          setState(() {
-                            _value = value;
-                            audioPlayer.seek(Duration(seconds: _value.toInt()));
-                          });
+                          if (mounted) {
+                            setState(() {
+                              _value = value;
+                              audioPlayer
+                                  .seek(Duration(seconds: _value.toInt()));
+                            });
+                          }
                         },
                         label:
                             formatDuration(Duration(seconds: _value.toInt())),
@@ -1642,9 +1764,11 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                             isPlaying
                                 ? audioPlayer.pause()
                                 : audioPlayer.play();
-                            setState(() {
-                              isPlaying = !isPlaying;
-                            });
+                            if (mounted) {
+                              setState(() {
+                                isPlaying = !isPlaying;
+                              });
+                            }
                           },
                         ),
                         IconButton(
@@ -1698,75 +1822,101 @@ class _LibraryPageState extends State<LibraryPage> {
   List<String> results = [];
   bool isList = true;
 
-  List<Album> libraryData = [
-    Album(
-      name: "StarBoy 1",
-      imageUrl: "assets/images/3.jpg",
-    ),
-    Album(
-      name: "StarBoy 2",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 3",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 4",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 5",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 1",
-      imageUrl: "assets/images/3.jpg",
-    ),
-    Album(
-      name: "StarBoy 2",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 3",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 4",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 5",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 1",
-      imageUrl: "assets/images/3.jpg",
-    ),
-    Album(
-      name: "StarBoy 2",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 3",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 4",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      name: "StarBoy 5",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    // Adicione mais álbuns conforme necessário
-  ];
+  // List<Album> libraryData = [
+  //   Album(
+  //     name: "StarBoy 1",
+  //     imageUrl: "assets/images/3.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 2",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 3",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 4",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 5",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 1",
+  //     imageUrl: "assets/images/3.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 2",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 3",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 4",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 5",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 1",
+  //     imageUrl: "assets/images/3.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 2",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 3",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 4",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     name: "StarBoy 5",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   // Adicione mais álbuns conforme necessário
+  // ];
 
-  void _createPlaylist() {}
+  List<Map<String, dynamic>> musicas = [];
+  AuthService authService = AuthService();
+
+  Future<void> fetchMusicasUser() async {
+    List<Map<String, dynamic>> fetchedMusicas =
+        await authService.getMusicasUser();
+
+    // Faça o processamento dos dados das músicas recebidas (por exemplo, salvar em uma variável do estado para uso na interface)
+    if (mounted) {
+      setState(() {
+        musicas = fetchedMusicas;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // Realize qualquer limpeza necessária aqui, como cancelar timers ou liberar recursos
+
+    super.dispose(); // Chamar o super.dispose()
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchMusicasUser(); // Chame a função para buscar as músicas do usuário assim que a página for iniciada
+  }
 
   @override
   Widget build(BuildContext context) {
-    // var size = MediaQuery.of(context).size;
+    var size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
@@ -1776,7 +1926,7 @@ class _LibraryPageState extends State<LibraryPage> {
         title: Row(
           children: [
             Image.asset(
-              'assets/images/playstore.png',
+              'assets/images/playstore.png', // logo, nao mexer
               width: 32,
               height: 32,
             ),
@@ -1801,7 +1951,6 @@ class _LibraryPageState extends State<LibraryPage> {
           const SizedBox(width: 8),
         ],
       ),
-      // body: Text("Library"),
       body: Stack(
         children: [
           Column(
@@ -1976,9 +2125,11 @@ class _LibraryPageState extends State<LibraryPage> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    isList = !isList;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      isList = !isList;
+                                    });
+                                  }
                                 },
                                 child: Icon(
                                   isList ? Icons.list : Icons.grid_view_rounded,
@@ -2011,19 +2162,19 @@ class _LibraryPageState extends State<LibraryPage> {
                                     5, // Espaçamento entre as linhas
                                 mainAxisExtent: 150, // Altura das linhas
                               ),
-                              itemCount: libraryData.length,
+                              itemCount: musicas.length,
                               itemBuilder: (BuildContext context, int index) {
-                                final data = libraryData[index];
+                                final data = musicas[index];
                                 return GestureDetector(
                                   onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => MusicDetailPage(
-                                          title: data.name,
-                                          description: "Wizkid",
+                                          title: data['title'],
+                                          description: data['description'],
                                           color: Colors.black,
-                                          img: data.imageUrl,
+                                          img: data['imageUrl'],
                                           songUrl: "assets/audio/gym.mp3",
                                         ),
                                       ),
@@ -2037,22 +2188,22 @@ class _LibraryPageState extends State<LibraryPage> {
                                             borderRadius:
                                                 BorderRadius.circular(8),
                                             child: Image.asset(
-                                              data.imageUrl,
+                                              data['imageUrl'],
                                               fit: BoxFit.cover,
                                               height: 100,
                                               width: 100,
                                             ),
                                           ),
                                         ),
-                                        const Padding(
-                                          padding: EdgeInsets.only(
+                                        Padding(
+                                          padding: const EdgeInsets.only(
                                               left: 0.0,
                                               top: 2.0,
                                               bottom: 1.0,
                                               right: 1.0),
                                           child: Text(
-                                            'Título da Legenda',
-                                            style: TextStyle(
+                                            data['title'],
+                                            style: const TextStyle(
                                               fontSize: 13,
                                               fontWeight: FontWeight.bold,
                                               // letterSpacing: -0.4,
@@ -2062,15 +2213,15 @@ class _LibraryPageState extends State<LibraryPage> {
                                             softWrap: false,
                                           ),
                                         ),
-                                        const Padding(
-                                          padding: EdgeInsets.only(
+                                        Padding(
+                                          padding: const EdgeInsets.only(
                                               left: 0.0,
                                               top: 2.0,
                                               bottom: 1.0,
                                               right: 1.0),
                                           child: Text(
-                                            'Subtítulo da Legenda',
-                                            style: TextStyle(
+                                            data['description'],
+                                            style: const TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.grey,
@@ -2101,9 +2252,9 @@ class _LibraryPageState extends State<LibraryPage> {
                             padding: const EdgeInsets.only(
                                 left: 0, right: 0, top: 0, bottom: 0),
                             child: ListView.builder(
-                              itemCount: libraryData.length,
+                              itemCount: musicas.length,
                               itemBuilder: (BuildContext context, int index) {
-                                final data = libraryData[index];
+                                final data = musicas[index];
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 6.0),
                                   child: GestureDetector(
@@ -2112,10 +2263,10 @@ class _LibraryPageState extends State<LibraryPage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => MusicDetailPage(
-                                            title: data.name,
-                                            description: "Wizkid",
+                                            title: data['title'],
+                                            description: data['description'],
                                             color: Colors.black,
-                                            img: data.imageUrl,
+                                            img: data['imageUrl'],
                                             songUrl: "assets/audio/gym.mp3",
                                           ),
                                         ),
@@ -2142,7 +2293,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                             borderRadius:
                                                 BorderRadius.circular(0),
                                             child: Image.asset(
-                                              data.imageUrl,
+                                              data['imageUrl'],
                                               fit: BoxFit.cover,
                                               height: 70,
                                               width: 70,
@@ -2155,16 +2306,16 @@ class _LibraryPageState extends State<LibraryPage> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  data.name,
+                                                  data['title'],
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 4),
-                                                const Text(
-                                                  "data.description",
-                                                  style: TextStyle(
+                                                Text(
+                                                  data['description'],
+                                                  style: const TextStyle(
                                                     fontSize: 14,
                                                     color: Colors.grey,
                                                   ),
@@ -2254,7 +2405,6 @@ class _LibraryPageState extends State<LibraryPage> {
             selectedIndex: 2,
             onTabChange: (index) {
               // print(index);
-
               if (index == 0) {
                 Navigator.pushReplacementNamed(context, '/home');
               } else if (index == 1) {
@@ -2299,6 +2449,96 @@ class NewPlaylistPage extends StatefulWidget {
 }
 
 class _NewPlaylistPageState extends State<NewPlaylistPage> {
+  final TextEditingController playlistController = TextEditingController();
+
+  void dispose() {
+    playlistController.dispose();
+    super.dispose();
+  }
+
+  void showAlert() {
+    // showDialog(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return AlertDialog(
+    //       title: Text('Playlist created'),
+    //       content: Text('Your playlist was created successfully'),
+    //       actions: [
+    //         TextButton(
+    //           onPressed: () {
+    //             Navigator.pop(context);
+    //             Navigator.pop(context);
+    //           },
+    //           child: const Text('Cancelar'),
+    //         ),
+    //         TextButton(
+    //           onPressed: () {
+    //             // Lógica a ser executada quando o botão "OK" for pressionado
+    //             Navigator.pop(context);
+    //             Navigator.pop(context);
+    //           },
+    //           child: Text('OK'),
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color.fromARGB(255, 221, 221, 221).withOpacity(0.9),
+          title: const Text(
+            'Are you sure?',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          content: const Icon(
+            Icons.help_outline,
+            color: Colors.yellow,
+            size: 80,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // Lógica a ser executada quando o botão "OK" for pressionado
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              // style: ButtonStyle(
+              //   backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+              // ),
+              child: const Text(
+                'OK',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -2355,15 +2595,8 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    // const Text(
-                    //   'New Playlist',
-                    //   style: TextStyle(
-                    //     fontSize: 24,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 15),
+                    // const SizedBox(height: 5),
                     const Text(
                       'Give your playlist a name',
                       style: TextStyle(
@@ -2372,31 +2605,23 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Container(
                       // color: Colors.amber,
                       margin: const EdgeInsets.symmetric(horizontal: 40),
                       // padding: EdgeInsets.symmetric(vertical: -5.0),
-                      child: const TextField(
-                        style: TextStyle(
+                      child: TextField(
+                        style: const TextStyle(
                           fontSize: 20,
-                          // decoration: TextDecoration
-                          //     .none, // Remove qualquer decoração existente
-                          // decorationStyle: null,
-                          // decorationStyle: TextDecorationStyle.solid,
-                        ), // Define o tamanho da fonte como 20
-
-                        decoration: InputDecoration(
+                        ),
+                        controller: playlistController,
+                        decoration: const InputDecoration(
                           hintText: 'Playlist name',
                           hintStyle: TextStyle(
                             fontSize: 20,
                             color: Colors.grey,
                           ),
                           contentPadding: EdgeInsets.only(left: 10.0),
-                          // enabledBorder: UnderlineInputBorder(
-                          //   borderSide:
-                          //       BorderSide.none, // Removes the underline
-                          // ),
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
                               color: Colors.grey,
@@ -2437,6 +2662,13 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
                           child: ElevatedButton(
                             onPressed: () {
                               // Lógica para Criar (aaddicionar playlist)
+                              final playlistName = playlistController.text;
+                              AuthService().createPlaylist(
+                                  playlistName, "Other", "playlistImage");
+
+                              showAlert();
+
+                              // Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
                               elevation: 0, // Remove a sombra
@@ -2475,18 +2707,664 @@ class ProfilePage extends StatefulWidget {
   _ProfilePageState createState() => _ProfilePageState();
 }
 
+// class _ProfilePageState extends State<ProfilePage> {
+//   String? getFirstName() {
+//     String? fullName = AuthService().getUserName();
+//   }
+//   List<Album> libraryData = [
+//     Album(
+//       name: "StarBoy 1",
+//       imageUrl: "assets/images/3.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 2",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 3",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 4",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 5",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 1",
+//       imageUrl: "assets/images/3.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 2",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 3",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 4",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 5",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 1",
+//       imageUrl: "assets/images/3.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 2",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 3",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 4",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     Album(
+//       name: "StarBoy 5",
+//       imageUrl: "assets/images/background.jpg",
+//     ),
+//     // Adicione mais álbuns conforme necessário
+//   ];
+//   bool isList = true;
+//   final List<Map<String, String>> data = [
+//     {
+//       'image': 'https://picsum.photos/100',
+//       'title': 'Título 1',
+//       'subtitle': 'Subtítulo 1'
+//     },
+//     {
+//       'image': 'https://picsum.photos/100',
+//       'title': 'Título 2',
+//       'subtitle': 'Subtítulo 2'
+//     },
+//     {
+//       'image': 'https://picsum.photos/100',
+//       'title': 'Título 3',
+//       'subtitle': 'Subtítulo 3'
+//     },
+//     {
+//       'image': 'https://picsum.photos/100',
+//       'title': 'Título 4',
+//       'subtitle': 'Subtítulo 4'
+//     },
+//   ];
+//   @override
+//   Widget build(BuildContext context) {
+//     final marginHeight = MediaQuery.of(context).size.height * 0.3;
+//     return Scaffold(
+//       body: Container(
+//         // color: Colors.black.withOpacity(0.5),
+//         child: Stack(
+//           children: [
+//             Container(
+//               decoration: const BoxDecoration(
+//                 image: DecorationImage(
+//                   image: AssetImage('assets/images/background.jpg'),
+//                   fit: BoxFit.cover,
+//                 ),
+//               ),
+//             ),
+//             Container(
+//               margin: EdgeInsets.only(top: marginHeight),
+//               color: Colors.white.withOpacity(0.7),
+//               // padding:
+//               //     const EdgeInsets.only(left: 5, top: 0, bottom: 0, right: 5),
+//               child: Column(
+//                 // mainAxisAlignment: MainAxisAlignment.center,
+//                 // crossAxisAlignment: CrossAxisAlignment.center,
+//                 // color: Colors.amber,
+//                 children: [
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Container(
+//                         // color: Colors.amber.withOpacity(0.9),
+//                         width: 70,
+//                         padding: const EdgeInsets.only(
+//                             left: 0, top: 5, bottom: 0, right: 0),
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.center,
+//                           children: [
+//                             CircleAvatar(
+//                               // profile image from google acount
+//                               // backgroundImage: AssetImage(
+//                               //   getProfileImage(),
+//                               // ),
+//                               // backgroundImage:
+//                               //     Image.network(
+//                               //       // Provider.of(context).auth.getProfileImage()),
+//                               //       AuthService().getProfileImage()),
+//                               backgroundImage: NetworkImage(
+//                                   AuthService().getProfileImage() ?? ''),
+//                               radius: 30,
+//                             ),
+//                             const SizedBox(height: 5),
+//                             Text(
+//                               AuthService().getUserName() ?? '',
+//                               // getFirstName(),
+//                               style: const TextStyle(
+//                                 fontSize: 12,
+//                                 // fontWeight: FontWeight.bold,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                       Container(
+//                         // color: Colors.blue.withOpacity(0.9),
+//                         // width: 90,
+//                         padding: const EdgeInsets.only(
+//                             left: 10, top: 5, bottom: 0, right: 10),
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Row(
+//                               mainAxisAlignment: MainAxisAlignment.center,
+//                               children: [
+//                                 Column(
+//                                   children: [
+//                                     Text(
+//                                       '2.9M',
+//                                       style: TextStyle(
+//                                         fontSize: 16,
+//                                         // fontWeight: FontWeight.bold,
+//                                       ),
+//                                     ),
+//                                     const SizedBox(height: 1),
+//                                     Text(
+//                                       'followers',
+//                                       style: TextStyle(
+//                                         fontSize: 12,
+//                                         // fontWeight: FontWeight.bold,
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                                 const SizedBox(width: 5),
+//                                 Column(
+//                                   children: [
+//                                     Text(
+//                                       '5.9',
+//                                       style: TextStyle(
+//                                         fontSize: 16,
+//                                       ),
+//                                     ),
+//                                     const SizedBox(height: 1),
+//                                     Text(
+//                                       'rating',
+//                                       style: TextStyle(
+//                                         fontSize: 12,
+//                                         // fontWeight: FontWeight.bold,
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                                 const SizedBox(width: 30),
+//                                 Column(
+//                                   children: [
+//                                     ElevatedButton(
+//                                       onPressed: () {
+//                                         // Adicione aqui a lógica para abrir a tela de edição de perfil
+//                                       },
+//                                       style: ElevatedButton.styleFrom(
+//                                         primary: Colors
+//                                             .transparent, // Não é mais necessário, utilize o backgroundColor
+//                                         onPrimary: Colors
+//                                             .black, // Define a cor do texto
+//                                         side: const BorderSide(
+//                                             color: Colors.black,
+//                                             width:
+//                                                 1.0), // Adiciona uma borda preta
+//                                         elevation: 0, // Remove a sombra
+//                                       ),
+//                                       child: const Text(
+//                                         'Editar Perfil',
+//                                         style: TextStyle(
+//                                           fontSize:
+//                                               13, // Diminui o tamanho do texto
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ],
+//                             ),
+//                             const SizedBox(height: 1),
+//                             const Row(
+//                               // descricao
+//                               mainAxisAlignment: MainAxisAlignment.start,
+//                               children: [
+//                                 Text(
+//                                   'Lorem ipsum dolor sit ametdsdadasd sss.',
+//                                   style: TextStyle(
+//                                     fontSize: 12,
+//                                     // fontWeight: FontWeight.bold,
+//                                   ),
+//                                   softWrap: true,
+//                                   maxLines:
+//                                       2, // Define o número máximo de linhas
+//                                   overflow: TextOverflow
+//                                       .ellipsis, // Adiciona "..." quando o texto é muito longo
+//                                   textAlign: TextAlign
+//                                       .center, // Centraliza o texto horizontalmente
+//                                 ),
+//                               ],
+//                             )
+//                           ],
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                   // const SizedBox(height: 5),
+//                   // Visibility(
+//                   //   visible:
+//                   //       true, // Define a visibilidade com base no valor de isList
+//                   //   child: SingleChildScrollView(
+//                   //     child: Container(
+//                   //       color: Colors.blue,
+//                   //       // height: MediaQuery.of(context).size.height * 0.4,
+//                   //       child: GridView.builder(
+//                   //         shrinkWrap: true,
+//                   //         padding: const EdgeInsets.only(
+//                   //             left: 14, right: 10, top: 10, bottom: 10),
+//                   //         gridDelegate:
+//                   //             const SliverGridDelegateWithFixedCrossAxisCount(
+//                   //           crossAxisCount: 3, // Número de colunas desejado
+//                   //           crossAxisSpacing: 5, // Espaçamento entre as colunas
+//                   //           mainAxisSpacing: 5, // Espaçamento entre as linhas
+//                   //           mainAxisExtent: 150, // Altura das linhas
+//                   //         ),
+//                   //         itemCount: libraryData.length,
+//                   //         itemBuilder: (BuildContext context, int index) {
+//                   //           final data = libraryData[index];
+//                   //           return GestureDetector(
+//                   //             onTap: () {
+//                   //               Navigator.push(
+//                   //                 context,
+//                   //                 MaterialPageRoute(
+//                   //                   builder: (context) => MusicDetailPage(
+//                   //                     title: data.name,
+//                   //                     description: "Wizkid",
+//                   //                     color: Colors.black,
+//                   //                     img: data.imageUrl,
+//                   //                     songUrl: "assets/audio/gym.mp3",
+//                   //                   ),
+//                   //                 ),
+//                   //               );
+//                   //             },
+//                   //             child: Container(
+//                   //               child: Column(
+//                   //                 children: [
+//                   //                   ClipRect(
+//                   //                     child: ClipRRect(
+//                   //                       borderRadius: BorderRadius.circular(8),
+//                   //                       child: Image.asset(
+//                   //                         data.imageUrl,
+//                   //                         fit: BoxFit.cover,
+//                   //                         height: 100,
+//                   //                         width: 100,
+//                   //                       ),
+//                   //                     ),
+//                   //                   ),
+//                   //                   const Padding(
+//                   //                     padding: EdgeInsets.only(
+//                   //                         left: 0.0,
+//                   //                         top: 2.0,
+//                   //                         bottom: 1.0,
+//                   //                         right: 1.0),
+//                   //                     child: Text(
+//                   //                       'Título da Legenda',
+//                   //                       style: TextStyle(
+//                   //                         fontSize: 13,
+//                   //                         fontWeight: FontWeight.bold,
+//                   //                         // letterSpacing: -0.4,
+//                   //                       ),
+//                   //                       overflow: TextOverflow.ellipsis,
+//                   //                       maxLines: 1,
+//                   //                       softWrap: false,
+//                   //                     ),
+//                   //                   ),
+//                   //                   const Padding(
+//                   //                     padding: EdgeInsets.only(
+//                   //                         left: 0.0,
+//                   //                         top: 2.0,
+//                   //                         bottom: 1.0,
+//                   //                         right: 1.0),
+//                   //                     child: Text(
+//                   //                       'Subtítulo da Legenda',
+//                   //                       style: TextStyle(
+//                   //                         fontSize: 11,
+//                   //                         fontWeight: FontWeight.bold,
+//                   //                         color: Colors.grey,
+//                   //                         // letterSpacing: -0.4,
+//                   //                       ),
+//                   //                       overflow: TextOverflow.ellipsis,
+//                   //                       maxLines: 2,
+//                   //                       softWrap: false,
+//                   //                     ),
+//                   //                   ),
+//                   //                 ],
+//                   //               ),
+//                   //             ),
+//                   //           );
+//                   //         },
+//                   //       ),
+//                   //     ),
+//                   //   ),
+//                   // ),
+//                   // const SizedBox(height: 5),
+//                   Visibility(
+//                     visible: true,
+//                     child: Expanded(
+//                       child: Container(
+//                         // color: Colors.blue,
+//                         child: ListView(
+//                           padding: const EdgeInsets.only(
+//                             left: 5,
+//                             right: 5,
+//                             top: 0,
+//                             bottom: 0,
+//                           ),
+//                           children: [
+//                             SingleChildScrollView(
+//                               child: GridView.builder(
+//                                 shrinkWrap: true,
+//                                 gridDelegate:
+//                                     const SliverGridDelegateWithFixedCrossAxisCount(
+//                                   crossAxisCount: 3,
+//                                   crossAxisSpacing: 5,
+//                                   mainAxisSpacing: 5,
+//                                   mainAxisExtent: 150,
+//                                 ),
+//                                 itemCount: libraryData.length,
+//                                 itemBuilder: (BuildContext context, int index) {
+//                                   final data = libraryData[index];
+//                                   return GestureDetector(
+//                                     onTap: () {
+//                                       Navigator.push(
+//                                         context,
+//                                         MaterialPageRoute(
+//                                           builder: (context) => MusicDetailPage(
+//                                             title: data.name,
+//                                             description: "Wizkid",
+//                                             color: Colors.black,
+//                                             img: data.imageUrl,
+//                                             songUrl: "assets/audio/gym.mp3",
+//                                           ),
+//                                         ),
+//                                       );
+//                                     },
+//                                     child: Container(
+//                                       child: Column(
+//                                         children: [
+//                                           ClipRect(
+//                                             child: ClipRRect(
+//                                               borderRadius:
+//                                                   BorderRadius.circular(8),
+//                                               child: Image.asset(
+//                                                 data.imageUrl,
+//                                                 fit: BoxFit.cover,
+//                                                 height: 100,
+//                                                 width: 100,
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           const Padding(
+//                                             padding: EdgeInsets.only(
+//                                               left: 0.0,
+//                                               top: 2.0,
+//                                               bottom: 1.0,
+//                                               right: 1.0,
+//                                             ),
+//                                             child: Text(
+//                                               'Título da Legenda',
+//                                               style: TextStyle(
+//                                                 fontSize: 13,
+//                                                 fontWeight: FontWeight.bold,
+//                                               ),
+//                                               overflow: TextOverflow.ellipsis,
+//                                               maxLines: 1,
+//                                               softWrap: false,
+//                                             ),
+//                                           ),
+//                                           const Padding(
+//                                             padding: EdgeInsets.only(
+//                                               left: 0.0,
+//                                               top: 2.0,
+//                                               bottom: 1.0,
+//                                               right: 1.0,
+//                                             ),
+//                                             child: Text(
+//                                               'Subtítulo da Legenda',
+//                                               style: TextStyle(
+//                                                 fontSize: 11,
+//                                                 fontWeight: FontWeight.bold,
+//                                                 color: Colors.grey,
+//                                               ),
+//                                               overflow: TextOverflow.ellipsis,
+//                                               maxLines: 2,
+//                                               softWrap: false,
+//                                             ),
+//                                           ),
+//                                         ],
+//                                       ),
+//                                     ),
+//                                   );
+//                                 },
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             // Container(),
+//           ],
+//         ),
+//       ),
+//       bottomNavigationBar: Container(
+//         color: const Color.fromARGB(75, 70, 70, 70),
+//         child: Padding(
+//           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+//           child: GNav(
+//             // backgroundColor: Color.fromARGB(0, 136, 136, 136),
+//             // rippleColor: Color.fromARGB(255, 226, 0, 0),
+//             // hoverColor: Color.fromARGB(255, 0, 255, 13),
+//             color: Colors.black,
+//             activeColor: Color.fromARGB(255, 214, 214, 214),
+//             // tabActiveBorder:
+//             //     Border.all(color: Color.fromARGB(255, 255, 255, 255), width: 1),
+//             tabBackgroundColor: Colors.black,
+//             // padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+//             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+//             // selectedIndex: _selectedIndex, 0
+//             gap: 6,
+//             iconSize: 24,
+//             // selectedIndex: 0,
+//             selectedIndex: 3,
+//             onTabChange: (index) {
+//               // print(index);
+//               if (index == 0) {
+//                 Navigator.pushReplacementNamed(context, '/home');
+//               } else if (index == 1) {
+//                 Navigator.pushReplacementNamed(context, '/search');
+//               } else if (index == 2) {
+//                 Navigator.pushReplacementNamed(context, '/library');
+//               } else if (index == 3) {
+//                 Navigator.pushReplacementNamed(context, '/profile');
+//               }
+//             },
+//             tabs: [
+//               GButton(
+//                 icon: Icons.home,
+//                 text: 'Home',
+//                 // height: 100.0,
+//               ),
+//               GButton(
+//                 icon: Icons.search,
+//                 text: 'Search',
+//               ),
+//               GButton(
+//                 icon: Icons.library_books,
+//                 text: 'Library',
+//               ),
+//               GButton(
+//                 icon: Icons.person,
+//                 text: 'Profile',
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 class _ProfilePageState extends State<ProfilePage> {
-  String? getFirstName() {
-    String? fullName = AuthService().getUserName();
+  // int counter = 0;
+  List<Map<String, dynamic>> myPlaylist = [];
+  Map<String, dynamic> userProfile = {};
+  bool isEditing = false;
+  TextEditingController bioController = TextEditingController();
+  String bio = '';
+  FocusNode bioFocusNode = FocusNode();
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   getmyplaylist();
+  //   // AuthService().getUserProfile();
+  //   getProfileInfo();
+  // }
+  void initState() {
+    super.initState();
+    myPlaylist = [];
+    userProfile = {};
+    getmyplaylist();
+    getProfileInfo();
+
+    bioController.text = bio;
+    // setCursorAtEnd();
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    bioController.dispose();
+    // Realize qualquer limpeza necessária aqui, como cancelar timers ou liberar recursos
+  }
+
+  void getmyplaylist() {
+    // Adicionar informacoes as musicas
+    if (mounted) {
+      // AuthService().uploadMusic(
+      //   " title 1",
+      //   "assets/images/cover.jpg",
+      //   "ruben descrition",
+      //   5,
+      // );
+      // AuthService().getPlaylist().then((value) {  //HERE
+      //   print(value);
+      // });
+      AuthService().getPlaylist().then((value) {
+        setState(() {
+          myPlaylist = value;
+        });
+      });
+    }
+  }
+
+  void setCursorAtEnd() {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      if (bioController.text.isNotEmpty) {
+        bioController.selection = TextSelection.fromPosition(
+          TextPosition(offset: bioController.text.length),
+        );
+      }
+    });
+  }
+
+  void getProfileInfo() {
+    if (mounted) {
+      AuthService().getUserProfile().then((value) {
+        setState(() {
+          userProfile = value;
+          // Atualizar o valor do TextField
+        });
+      });
+    }
+  }
+
+  String getButtonText() {
+    return isEditing ? '    Guardar   ' : 'Editar Perfil';
+  }
+
+  // void saveChanges() {
+  //   String newBio = bioController.text;
+
+  //   // Implemente a lógica para salvar as alterações no perfil
+
+  //   setState(() {
+  //     isEditing = false;
+  //     bio = newBio;
+  //   });
+  // }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('Minha Página'),
+  //     ),
+  //     body: ListView.builder(
+  //       itemCount: myPlaylist.length,
+  //       itemBuilder: (context, index) {
+  //         Map<String, dynamic> playlistData = myPlaylist[index];
+  //         return ListTile(
+  //           title: Text(playlistData['title']),
+  //           subtitle: Text(playlistData['type'] ?? 'Type not available'),
+  //           // Exiba outras informações necessárias
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
   Widget build(BuildContext context) {
     final marginHeight = MediaQuery.of(context).size.height * 0.3;
+    String bio = userProfile['bio'] ?? '';
+    int followers = userProfile['followers'] ?? 0;
+    double rating = userProfile['rating'] ?? 0.0;
+
+    // bio = userProfile['bio'] ?? '';
+    bioController.text = bio;
+
+    bioController.selection = TextSelection.fromPosition(
+        TextPosition(offset: bioController.text.length));
+
+    // bioFocusNode.addListener(() {
+    //   if (bioFocusNode.hasFocus) {
+    //     // Defina a posição do cursor no final do texto
+    //     bioController.selection = TextSelection.fromPosition(
+    //       TextPosition(offset: bioController.text.length),
+    //     );
+    //   }
+    // });
 
     return Scaffold(
       body: Container(
-        // color: Colors.black.withOpacity(0.5),
         child: Stack(
           children: [
             Container(
@@ -2497,141 +3375,327 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
-            Container(
-              margin: EdgeInsets.only(top: marginHeight),
-              color: Colors.white.withOpacity(0.8),
-              padding:
-                  const EdgeInsets.only(left: 14, top: 5, bottom: 5, right: 14),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    color: Colors.amber.withOpacity(0.9),
-                    width: 90,
-                    padding: const EdgeInsets.only(
-                        left: 0, top: 0, bottom: 0, right: 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+            Padding(
+              padding: EdgeInsets.only(top: marginHeight),
+              child: Container(
+                // margin: EdgeInsets.only(top: marginHeight),
+                color: Colors.white.withOpacity(0.7),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircleAvatar(
-                          // profile image from google acount
-                          // backgroundImage: AssetImage(
-                          //   getProfileImage(),
-                          // ),
-                          // backgroundImage:
-                          //     Image.network(
-                          //       // Provider.of(context).auth.getProfileImage()),
-                          //       AuthService().getProfileImage()),
-                          backgroundImage: NetworkImage(
-                              AuthService().getProfileImage() ?? ''),
-
-                          radius: 38,
+                        Container(
+                          // color: Colors.amber.withOpacity(0.9),
+                          width: 70,
+                          padding: const EdgeInsets.only(
+                              left: 0, top: 5, bottom: 0, right: 0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                // profile image from google acount
+                                // backgroundImage: AssetImage(
+                                //   getProfileImage(),
+                                // ),
+                                // backgroundImage:
+                                //     Image.network(
+                                //       // Provider.of(context).auth.getProfileImage()),
+                                //       AuthService().getProfileImage()),
+                                backgroundImage: NetworkImage(
+                                    AuthService().getProfileImage() ?? ''),
+                                radius: 30,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                AuthService().getUserName() ?? '',
+                                // getFirstName(),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  // fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 1),
-                        Text(
-                          AuthService().getUserName() ?? '',
-                          // getFirstName(),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            // fontWeight: FontWeight.bold,
+                        Container(
+                          // color: Colors.blue.withOpacity(0.9),
+                          // width: 90,
+                          padding: const EdgeInsets.only(
+                              left: 10, top: 5, bottom: 0, right: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(
+                                        followers.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      // const SizedBox(height: 1),
+                                      const Text(
+                                        'followers',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          // fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Column(
+                                    children: [
+                                      Text(
+                                        rating.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      // const SizedBox(height: 1),
+                                      const Text(
+                                        'rating',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          // fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 30),
+                                  Column(
+                                    children: [
+                                      ElevatedButton(
+                                        // onPressed:
+                                        // isEditing ? saveChanges : () {},
+                                        onPressed: () {
+                                          if (mounted) {
+                                            // setState(() {
+                                            // isEditing = !isEditing;
+                                            // if (isEditing) {
+                                            //   FocusScope.of(context)
+                                            //       .requestFocus(bioFocusNode);
+                                            // }
+                                            if (isEditing) {
+                                              String newBio =
+                                                  bioController.text;
+                                              AuthService().updateBio(newBio);
+
+                                              // Atualize o valor da variável bio
+                                              setState(() {
+                                                bio = newBio;
+                                                isEditing = false;
+                                              });
+                                            } else {
+                                              setState(() {
+                                                isEditing = true;
+                                              });
+                                              FocusScope.of(context)
+                                                  .requestFocus(bioFocusNode);
+                                            }
+                                            // }
+                                            // );
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors
+                                              .transparent, // Não é mais necessário, utilize o backgroundColor
+                                          onPrimary: Colors
+                                              .black, // Define a cor do texto
+                                          side: const BorderSide(
+                                              color: Colors.black,
+                                              width:
+                                                  1.0), // Adiciona uma borda preta
+                                          elevation: 0, // Remove a sombra
+                                        ),
+                                        child: Text(
+                                          getButtonText(),
+                                          style: const TextStyle(
+                                            fontSize:
+                                                13, // Diminui o tamanho do texto
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              // const SizedBox(height: 3),
+                              Row(
+                                // descricao
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  isEditing
+                                      ? Container(
+                                          // color: Colors.amber.withOpacity(0.9),
+                                          width: 210,
+                                          height: 25,
+                                          // padding:
+                                          //     EdgeInsets.symmetric(vertical: 1),
+                                          child: TextField(
+                                            // bio,
+                                            controller: bioController,
+                                            focusNode: bioFocusNode,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                            ),
+
+                                            decoration: const InputDecoration(
+                                              enabledBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                  color: Colors.black,
+                                                  width: 1.0,
+                                                ),
+                                              ),
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                  color: Colors.black,
+                                                  width: 1.0,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          bio,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            // fontWeight: FontWeight.bold,
+                                          ),
+                                          softWrap: true,
+                                          maxLines:
+                                              2, // Define o número máximo de linhas
+                                          overflow: TextOverflow
+                                              .ellipsis, // Adiciona "..." quando o texto é muito longo
+                                          textAlign: TextAlign
+                                              .center, // Centraliza o texto horizontalmente
+                                        ),
+                                ],
+                              )
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  Container(
-                    color: Colors.blue.withOpacity(0.9),
-                    // width: 90,
-                    padding: const EdgeInsets.only(
-                        left: 10, top: 10, bottom: 0, right: 10),
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  '2.9M',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    // fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  'followers',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    // fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                    Visibility(
+                      visible: myPlaylist.isNotEmpty,
+                      child: Expanded(
+                        child: Container(
+                          // color: Colors.blue,
+                          child: ListView(
+                            padding: const EdgeInsets.only(
+                              left: 5,
+                              right: 5,
+                              top: 0,
+                              bottom: 0,
                             ),
-                            const SizedBox(width: 5),
-                            Column(
-                              children: [
-                                Text(
-                                  '5.9',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                  ),
+                            children: [
+                              GridView.builder(
+                                shrinkWrap: true,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 5,
+                                  mainAxisSpacing: 5,
+                                  mainAxisExtent: 150,
                                 ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  'rating',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    // fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 5),
-                            Column(
-                              children: [
-                                Text(
-                                  '2.9M',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    // fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  'followers',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    // fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          // descricao
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Lorem ipsum dolor sit amet . \n Lorem ipsum dolor sit amet .',
-                              style: TextStyle(
-                                fontSize: 12,
-                                // fontWeight: FontWeight.bold,
+                                itemCount: myPlaylist.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final data = myPlaylist[index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MusicDetailPage(
+                                            title: data['title'],
+                                            description: data['description'],
+                                            color: Colors.black,
+                                            img: data['imageUrl'],
+                                            songUrl: "assets/audio/gym.mp3",
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      child: Column(
+                                        children: [
+                                          ClipRect(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: Image.asset(
+                                                data['imageUrl'],
+                                                fit: BoxFit.cover,
+                                                height: 100,
+                                                width: 100,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 0.0,
+                                              top: 2.0,
+                                              bottom: 1.0,
+                                              right: 1.0,
+                                            ),
+                                            child: Text(
+                                              data['title'],
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              softWrap: false,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 0.0,
+                                              top: 2.0,
+                                              bottom: 1.0,
+                                              right: 1.0,
+                                            ),
+                                            child: Text(
+                                              data['description'],
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              softWrap: false,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
-                            ),
-                          ],
-                        )
-                      ],
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
         ),
+        // ),
       ),
       bottomNavigationBar: Container(
         color: const Color.fromARGB(75, 70, 70, 70),
@@ -2655,7 +3719,6 @@ class _ProfilePageState extends State<ProfilePage> {
             selectedIndex: 3,
             onTabChange: (index) {
               // print(index);
-
               if (index == 0) {
                 Navigator.pushReplacementNamed(context, '/home');
               } else if (index == 1) {
