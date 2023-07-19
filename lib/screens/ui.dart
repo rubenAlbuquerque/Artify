@@ -24,7 +24,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  // final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   // Future<void> _signInWithGoogle(BuildContext context) async {
   //   final userCredential = await AuthService().signInWithGoogle();
@@ -260,6 +260,7 @@ class _HomeState extends State<HomePage> {
   late List<Story> stories;
   late List<Post> posts; // Adicione a declaração da lista de posts
   late Timer timer;
+  // late var timer;
   // bool mounted = true;
 
   List<Story> generateStories(int count) {
@@ -303,16 +304,15 @@ class _HomeState extends State<HomePage> {
     stories = generateStories(5); // Defina o número de histórias desejado
     posts = generatePosts(10); // Defina o número de posts desejado
 
-    // timer = Timer.periodic(const Duration(seconds: 60), (Timer t) {
-    //   if (!mounted) {
-    //     timer.cancel();
-    //   } else {
-    //     setState(() {});
-    //   }
-    // });
+    timer = Timer.periodic(const Duration(seconds: 60), (Timer t) {
+      if (!mounted) {
+        timer.cancel();
+      } else {
+        setState(() {});
+      }
+    });
   }
 
-  // late var timer;
   // void initState() {
   //   super.initState();
   //   // fetchDataVip();
@@ -325,11 +325,11 @@ class _HomeState extends State<HomePage> {
   //   });
   // }
 
-  // @override
-  // void dispose() {
-  //   timer.cancel();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
 
   Future<void> logOut() async {
     final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -633,7 +633,6 @@ class _HomeState extends State<HomePage> {
 }
 
 //
-
 class UploadPage extends StatefulWidget {
   @override
   _UploadPageState createState() => _UploadPageState();
@@ -767,27 +766,34 @@ class _SearchState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   List<String> results = [];
+  late Timer timer;
+  // bool mounted = true;
+  List<Map<String, String>> _searchResults = [];
+  List<Map<String, String>> recumendations = [];
+  List<Map<String, String>> popularesMusicas = [];
+  // late Future<List<Map<String, String>>> popularesMusicas;
 
-  List<Album> albums = [
-    Album(
-      id: "kkkkkkkkkkkkkkkkkkkk1",
-      name: "StarBoy 1",
-      imageUrl: "assets/images/3.jpg",
-    ),
-    Album(
-      id: "kkkkkkkkkkkkkkkkkkkk2",
-      name: "StarBoy 2",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    Album(
-      id: "kkkkkkkkkkkkkkkkkkkk2",
-      name: "StarBoy 3",
-      imageUrl: "assets/images/background.jpg",
-    ),
-    // Adicione mais álbuns conforme necessário
-  ];
+  // firebase
+  // List<Album> albums = [
+  //   Album(
+  //     id: "kkkkkkkkkkkkkkkkkkkk1",
+  //     name: "StarBoy 1",
+  //     imageUrl: "assets/images/3.jpg",
+  //   ),
+  //   Album(
+  //     id: "kkkkkkkkkkkkkkkkkkkk2",
+  //     name: "StarBoy 2",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   Album(
+  //     id: "kkkkkkkkkkkkkkkkkkkk2",
+  //     name: "StarBoy 3",
+  //     imageUrl: "assets/images/background.jpg",
+  //   ),
+  //   // Adicione mais álbuns conforme necessário
+  // ];
 
-  void search() {
+  void search(String searchText) {
     // String searchTerm = _searchController.text;
     // print searchTerm
     // print(searchTerm);
@@ -798,6 +804,15 @@ class _SearchState extends State<SearchPage> {
     //         album.name.toLowerCase().contains(searchTerm.toLowerCase()))
     //     .toList();
 
+    AuthService().searchterm(searchText).then((results) {
+      if (mounted) {
+        setState(() {
+          _searchResults = results;
+          // _isSearching = false;
+        });
+      }
+    });
+
     if (mounted) {
       setState(() {
         // results = filteredList;
@@ -805,8 +820,98 @@ class _SearchState extends State<SearchPage> {
     }
   }
 
-  late Timer timer;
-  // bool mounted = true;
+  // void inicio() async {
+  //   if (mounted) {
+  //     setState(() {
+  //       recumendations = AuthService().recumendacoes();
+  //       // populares()
+  //       popularesMusicas = AuthService().populares();
+  //     });
+  //   }
+  //   ;
+  // }
+
+  void inicio() {
+    AuthService().recumendacoes().then((recommendations) {
+      if (mounted) {
+        setState(() {
+          recumendations = recommendations;
+        });
+      }
+    });
+
+    AuthService().populares().then((popularMusic) {
+      if (mounted) {
+        setState(() {
+          popularesMusicas = popularMusic;
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    inicio();
+  }
+
+  Widget getImage(String imageUrl) {
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      print("Image URL: ruben");
+      try {
+        print('left------------------');
+        return Container(
+          width: 70, // Defina a largura desejada
+          height: 130, // Defina a altura desejada
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit
+                .cover, // Ajuste o modo de ajuste da imagem (cover, contain, etc.)
+          ),
+        );
+      } catch (e) {
+        print('Error loading image: $e');
+        return Container(
+          width: 50,
+          height: 50,
+          color: Colors.grey,
+          child: const Icon(
+            Icons.image_not_supported,
+            color: Colors.white,
+          ),
+        );
+      }
+    } else {
+      try {
+        print('Right------------------');
+        return Container(
+          width: 60,
+          height: 140,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              imageUrl,
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      } catch (e) {
+        print('Error loading image: $e');
+        return Container(
+          width: 60,
+          height: 140,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              // playstore.png,
+              "assets/images/playstore.png",
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -1015,7 +1120,7 @@ class _SearchState extends State<SearchPage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
+        padding: EdgeInsets.symmetric(horizontal: 0),
         //horizontal: 10.0).copyWith(right: 0),
         child: SingleChildScrollView(
           child: Column(
@@ -1023,7 +1128,558 @@ class _SearchState extends State<SearchPage> {
             children: [
               Column(
                 children: [
-                  const Padding(
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 14),
+                    child: Align(
+                      alignment: Alignment.centerLeft, // Alinhar à esquerda
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        // Adicionar padding vertical
+                        child: Text(
+                          'New Albums',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Container(
+                    color: const Color.fromARGB(255, 183, 59, 59),
+                    height: 300, // Altura fixa para o ListView.builder
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: recumendations.length,
+                      itemBuilder: (context, index) {
+                        final r = recumendations[index];
+                        return SizedBox(
+                          width:
+                              200, // Largura máxima do item do ListView.builder
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 3.0,
+                              horizontal: 16.0,
+                            ),
+                            leading:
+                                getImage(r['musicImage'] ?? 'image default'),
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 8),
+                                Text(
+                                  r['musicTitle'] ?? 'title default',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  r['description'] ?? 'description default',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  // ListView.builder(
+                  //   itemCount: _searchResults.length,
+                  //   itemBuilder: (context, index) {
+                  //     final r = _searchResults[index];
+                  //     return ListTile(
+                  //       contentPadding: const EdgeInsets.symmetric(
+                  //           vertical: 3.0, horizontal: 16.0),
+                  //       leading: getImage(
+                  //         r['image'] ?? 'image default',
+                  //       ),
+                  //       title: Column(
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           Text(
+                  //             r['title'] ?? 'title default',
+                  //             style: const TextStyle(
+                  //               fontSize: 16,
+                  //               fontWeight: FontWeight.bold,
+                  //             ),
+                  //           ),
+                  //           Text(
+                  //             r['type'] ?? 'type default',
+                  //             style: const TextStyle(
+                  //               fontSize: 14,
+                  //               color: Colors.grey,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
+                  //
+                  // Container(
+                  //   color: Color.fromARGB(255, 94, 167, 48),
+                  //   child: TextButton(
+                  //     onPressed: () {
+                  //       // Ação quando o botão "Ver mais" for pressionado
+                  //     },
+                  //     child: FutureBuilder<List<Map<String, String>>>(
+                  //       future: recumendations,
+                  //       builder: (context, snapshot) {
+                  //         if (snapshot.hasData) {
+                  //           final List<Map<String, String>> recommendations =
+                  //               snapshot.data!;
+
+                  //           // Criar uma lista de widgets para serem exibidos na rolagem horizontal
+                  //           List<Widget> widgets = [];
+                  //           for (Map<String, String> recommendation
+                  //               in recommendations) {
+                  //             widgets.add(
+                  //               Padding(
+                  //                 padding: const EdgeInsets.all(8.0),
+                  //                 child: Column(
+                  //                   mainAxisAlignment: MainAxisAlignment.center,
+                  //                   children: [
+                  //                     Container(
+                  //                       width: 200,
+                  //                       height: 200,
+                  //                       decoration: BoxDecoration(
+                  //                         borderRadius:
+                  //                             BorderRadius.circular(10),
+                  //                         image: DecorationImage(
+                  //                           image: AssetImage(
+                  //                               recommendation['imageUrl'] ??
+                  //                                   ''),
+                  //                           fit: BoxFit.cover,
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                     SizedBox(height: 8),
+                  //                     Text(
+                  //                       recommendation["musicTitle"] ??
+                  //                           'Unknown',
+                  //                       style: TextStyle(
+                  //                         color: Colors.white,
+                  //                         fontSize: 16,
+                  //                         fontWeight: FontWeight.bold,
+                  //                       ),
+                  //                     ),
+                  //                     SizedBox(height: 4),
+                  //                     Text(
+                  //                       recommendation['description'] ??
+                  //                           'artist',
+                  //                       style: TextStyle(
+                  //                         color: Colors.white,
+                  //                         fontSize: 14,
+                  //                       ),
+                  //                     ),
+                  //                   ],
+                  //                 ),
+                  //               ),
+                  //             );
+                  //           }
+
+                  //           return SizedBox(
+                  //             height: 200,
+                  //             child: ListView(
+                  //               scrollDirection: Axis.horizontal,
+                  //               children: widgets,
+                  //             ),
+                  //           );
+                  //         } else if (snapshot.hasError) {
+                  //           return Text('Error: ${snapshot.error}');
+                  //         }
+                  //         // Mostrar um indicador de carregamento enquanto espera a conclusão do Future
+                  //         return Center(child: CircularProgressIndicator());
+                  //       },
+                  //     ),
+                  //   ),
+                  // ),
+
+                  // Container(
+                  //   color: Color.fromARGB(255, 94, 167, 48),
+                  //   child: TextButton(
+                  //     onPressed: () {
+                  //       // Ação quando o botão "Ver mais" é pressionado
+                  //     },
+                  //     child: FutureBuilder<List<Map<String, String>>>(
+                  //       future: recumendations,
+                  //       builder: (context, snapshot) {
+                  //         if (snapshot.hasData) {
+                  //           final List<Map<String, String>> recommendations =
+                  //               snapshot.data!;
+
+                  //           // Create a list of widgets to be displayed in the horizontal scroll
+                  //           List<Widget> widgets = [];
+                  //           for (Map<String, String> recommendation
+                  //               in recommendations) {
+                  //             widgets.add(
+                  //               Padding(
+                  //                 padding: const EdgeInsets.all(8.0),
+                  //                 child: Column(
+                  //                   mainAxisAlignment: MainAxisAlignment.center,
+                  //                   children: [
+                  //                     Container(
+                  //                       width: 200,
+                  //                       height: 200,
+                  //                       decoration: BoxDecoration(
+                  //                         borderRadius:
+                  //                             BorderRadius.circular(10),
+                  //                         image: DecorationImage(
+                  //                           image: AssetImage(
+                  //                               recommendation['imageUrl'] ??
+                  //                                   ''),
+                  //                           fit: BoxFit.cover,
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                     SizedBox(height: 8),
+                  //                     Text(
+                  //                       recommendation["musicTitle"] ??
+                  //                           'Unknown',
+                  //                       style: TextStyle(
+                  //                         color: Colors.white,
+                  //                         fontSize: 16,
+                  //                         fontWeight: FontWeight.bold,
+                  //                       ),
+                  //                     ),
+                  //                     SizedBox(height: 4),
+                  //                     Text(
+                  //                       recommendation['description'] ??
+                  //                           'artist',
+                  //                       style: TextStyle(
+                  //                         color: Colors.white,
+                  //                         fontSize: 14,
+                  //                       ),
+                  //                     ),
+                  //                   ],
+                  //                 ),
+                  //               ),
+                  //             );
+                  //           }
+
+                  //           return SizedBox(
+                  //             height: 200,
+                  //             child: ListView(
+                  //               scrollDirection: Axis.horizontal,
+                  //               children: widgets,
+                  //             ),
+                  //           );
+                  //         } else if (snapshot.hasError) {
+                  //           return Text('Error: ${snapshot.error}');
+                  //         }
+                  //         // Show a loading indicator while waiting for the future to complete
+                  //         return Center(child: CircularProgressIndicator());
+                  //       },
+                  //     ),
+
+                  //     // child: FutureBuilder<List<Map<String, String>>>(
+                  //     //   future: recumendations,
+                  //     //   builder: (context, snapshot) {
+                  //     //     if (snapshot.hasData) {
+                  //     //       final List<Map<String, String>> recommendations =
+                  //     //           snapshot.data!;
+                  //     //       // Create a list of widgets to be displayed in the horizontal scroll
+                  //     //       List<Widget> widgets = [];
+                  //     //       for (Map<String, String> recommendation
+                  //     //           in recommendations) {
+                  //     //         widgets.add(
+                  //     //           Padding(
+                  //     //             padding: const EdgeInsets.all(8.0),
+                  //     //             child: Column(
+                  //     //               mainAxisAlignment: MainAxisAlignment.center,
+                  //     //               children: [
+                  //     //                 Image.network(
+                  //     //                   recommendation['imageUrl'] ?? 'img',
+                  //     //                   fit: BoxFit.cover,
+                  //     //                 ),
+                  //     //                 Text(
+                  //     //                   recommendation["musicTitle"] ??
+                  //     //                       'Unknown',
+                  //     //                   style: TextStyle(
+                  //     //                     color: Colors.white,
+                  //     //                     fontSize: 16,
+                  //     //                   ),
+                  //     //                 ),
+                  //     //                 Text(
+                  //     //                   recommendation['description'] ??
+                  //     //                       'artist',
+                  //     //                   style: TextStyle(
+                  //     //                     color: Colors.white,
+                  //     //                     fontSize: 14,
+                  //     //                   ),
+                  //     //                 ),
+                  //     //               ],
+                  //     //             ),
+                  //     //           ),
+                  //     //         );
+                  //     //       }
+                  //     //       return SizedBox(
+                  //     //         height: 100,
+                  //     //         child: ListView(
+                  //     //           scrollDirection: Axis.horizontal,
+                  //     //           children: widgets,
+                  //     //         ),
+                  //     //       );
+                  //     //     } else if (snapshot.hasError) {
+                  //     //       return Text('Error: ${snapshot.error}');
+                  //     //     }
+                  //     //     // Show a loading indicator while waiting for the future to complete
+                  //     //     return CircularProgressIndicator();
+                  //     //   },
+                  //     // ),
+                  //     // child: FutureBuilder<List<Map<String, String>>>(
+                  //     //   future: recumendations,
+                  //     //   builder: (context, snapshot) {
+                  //     //     if (snapshot.hasData) {
+                  //     //       final List<Map<String, String>> recommendations =
+                  //     //           snapshot.data!;
+                  //     //       // Create a list of widgets to be displayed in the horizontal scroll
+                  //     //       List<Widget> widgets = [];
+                  //     //       for (Map<String, String> recommendation
+                  //     //           in recommendations) {
+                  //     //         widgets.add(
+                  //     //           Padding(
+                  //     //             padding: const EdgeInsets.all(8.0),
+                  //     //             child: Column(
+                  //     //               mainAxisAlignment: MainAxisAlignment.center,
+                  //     //               children: [
+                  //     //                 Container(
+                  //     //                   width: 200,
+                  //     //                   height: 200,
+                  //     //                   decoration: BoxDecoration(
+                  //     //                     borderRadius:
+                  //     //                         BorderRadius.circular(10),
+                  //     //                     image: DecorationImage(
+                  //     //                       image: NetworkImage(
+                  //     //                           recommendation['imageUrl'] ??
+                  //     //                               'img'),
+                  //     //                       fit: BoxFit.cover,
+                  //     //                     ),
+                  //     //                   ),
+                  //     //                 ),
+                  //     //                 SizedBox(height: 8),
+                  //     //                 Text(
+                  //     //                   recommendation["musicTitle"] ??
+                  //     //                       'Unknown',
+                  //     //                   style: TextStyle(
+                  //     //                     color: Colors.white,
+                  //     //                     fontSize: 16,
+                  //     //                     fontWeight: FontWeight.bold,
+                  //     //                   ),
+                  //     //                 ),
+                  //     //                 SizedBox(height: 4),
+                  //     //                 Text(
+                  //     //                   recommendation['description'] ??
+                  //     //                       'artist',
+                  //     //                   style: TextStyle(
+                  //     //                     color: Colors.white,
+                  //     //                     fontSize: 14,
+                  //     //                   ),
+                  //     //                 ),
+                  //     //               ],
+                  //     //             ),
+                  //     //           ),
+                  //     //         );
+                  //     //       }
+                  //     //       return SizedBox(
+                  //     //         height: 200,
+                  //     //         child: ListView(
+                  //     //           scrollDirection: Axis.horizontal,
+                  //     //           children: widgets,
+                  //     //         ),
+                  //     //       );
+                  //     //     } else if (snapshot.hasError) {
+                  //     //       return Text('Error: ${snapshot.error}');
+                  //     //     }
+                  //     //     // Show a loading indicator while waiting for the future to complete
+                  //     //     return Center(child: CircularProgressIndicator());
+                  //     //   },
+                  //     // ),
+                  //   ),
+                  // ),
+
+                  // ListView.builder(
+                  //   itemCount: _searchResults.length,
+                  //   itemBuilder: (context, index) {
+                  //     final r = _searchResults[index];
+                  //     return ListTile(
+                  //       contentPadding: const EdgeInsets.symmetric(
+                  //           vertical: 3.0, horizontal: 16.0),
+                  //       leading: getImage(
+                  //         r['image'] ?? 'image default',
+                  //       ),
+                  //       title: Column(
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           Text(
+                  //             r['title'] ?? 'title default',
+                  //             style: const TextStyle(
+                  //               fontSize: 16,
+                  //               fontWeight: FontWeight.bold,
+                  //             ),
+                  //           ),
+                  //           Text(
+                  //             r['type'] ?? 'type default',
+                  //             style: const TextStyle(
+                  //               fontSize: 14,
+                  //               color: Colors.grey,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
+
+                  // SizedBox(
+                  //   height: 150,
+                  //   child: ListView.builder(
+                  //     padding: EdgeInsets.zero,
+                  //     scrollDirection: Axis.horizontal,
+                  //     itemCount: albums.length,
+                  //     itemBuilder: (BuildContext context, int index) {
+                  //       final album = albums[index];
+                  //       return GestureDetector(
+                  //         onTap: () {
+                  //           // Navegar para a página do reprodutor de música
+                  //           // print( 'Tocando ${album.name}, do ${album.imageUrl}');
+                  //           Navigator.push(
+                  //             context,
+                  //             MaterialPageRoute(
+                  //               builder: (context) =>
+                  //                   // MusicDetailPage(), // AudioPlayerSreen(),
+                  //                   MusicDetailPage(
+                  //                 musicID: album.id,
+                  //                 title: album.name,
+                  //                 description: "Wizkid",
+                  //                 color: Colors.black,
+                  //                 img: album.imageUrl,
+                  //                 songUrl: "assets/audio/gym.mp3",
+                  //                 // final String title;
+                  //                 // final String description;
+                  //                 // final Color color;
+                  //                 // final String img;
+                  //                 // final String songUrl;
+                  //                 // ),
+                  //               ),
+                  //             ),
+                  //           );
+                  //         },
+                  //         child: Column(
+                  //           children: [
+                  //             Padding(
+                  //               padding: const EdgeInsets.only(left: 14),
+                  //               child: Container(
+                  //                 width: 120,
+                  //                 height: 120,
+                  //                 decoration: BoxDecoration(
+                  //                   borderRadius: BorderRadius.circular(8),
+                  //                   image: DecorationImage(
+                  //                     image: AssetImage(album.imageUrl),
+                  //                     fit: BoxFit.cover,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //             const SizedBox(height: 4),
+                  //             Padding(
+                  //               padding: const EdgeInsets.only(left: 14),
+                  //               child: SizedBox(
+                  //                 width: 120,
+                  //                 child: Center(
+                  //                   child: Text(
+                  //                     album.name,
+                  //                     style: const TextStyle(fontSize: 14),
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
+                  SizedBox(height: 6),
+                  // SizedBox(
+                  //   height: 150,
+                  //   child: ListView.builder(
+                  //     padding: EdgeInsets.zero,
+                  //     scrollDirection: Axis.horizontal,
+                  //     itemCount: albums.length,
+                  //     itemBuilder: (BuildContext context, int index) {
+                  //       final album = albums[index];
+                  //       return GestureDetector(
+                  //         onTap: () {
+                  //           // Navegar para a página do reprodutor de música
+                  //           // print( 'Tocando ${album.name}, do ${album.imageUrl}');
+                  //           Navigator.push(
+                  //             context,
+                  //             MaterialPageRoute(
+                  //               builder: (context) =>
+                  //                   // MusicDetailPage(), // AudioPlayerSreen(),
+                  //                   MusicDetailPage(
+                  //                 musicID: album.id,
+                  //                 title: album.name,
+                  //                 description: "Wizkid",
+                  //                 color: Colors.black,
+                  //                 img: album.imageUrl,
+                  //                 songUrl: "assets/audio/gym.mp3",
+                  //                 // final String title;
+                  //                 // final String description;
+                  //                 // final Color color;
+                  //                 // final String img;
+                  //                 // final String songUrl;
+                  //                 // ),
+                  //               ),
+                  //             ),
+                  //           );
+                  //         },
+                  //         child: Column(
+                  //           children: [
+                  //             Padding(
+                  //               padding: const EdgeInsets.only(left: 14),
+                  //               child: Container(
+                  //                 width: 120,
+                  //                 height: 120,
+                  //                 decoration: BoxDecoration(
+                  //                   borderRadius: BorderRadius.circular(8),
+                  //                   image: DecorationImage(
+                  //                     image: AssetImage(album.imageUrl),
+                  //                     fit: BoxFit.cover,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //             const SizedBox(height: 4),
+                  //             Padding(
+                  //               padding: const EdgeInsets.only(left: 14),
+                  //               child: SizedBox(
+                  //                 width: 120,
+                  //                 child: Center(
+                  //                   child: Text(
+                  //                     album.name,
+                  //                     style: const TextStyle(fontSize: 14),
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
+                  SizedBox(height: 6),
+                  Padding(
                     padding: EdgeInsets.symmetric(horizontal: 14),
                     child: Align(
                       alignment: Alignment.centerLeft, // Alinhar à esquerda
@@ -1041,75 +1697,145 @@ class _SearchState extends State<SearchPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    height: 150,
-                    child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: albums.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final album = albums[index];
-                        return GestureDetector(
-                          onTap: () {
-                            // Navegar para a página do reprodutor de música
-                            // print( 'Tocando ${album.name}, do ${album.imageUrl}');
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    // MusicDetailPage(), // AudioPlayerSreen(),
-                                    MusicDetailPage(
-                                  musicID: album.id,
-                                  title: album.name,
-                                  description: "Wizkid",
-                                  color: Colors.black,
-                                  img: album.imageUrl,
-                                  songUrl: "assets/audio/gym.mp3",
-                                  // final String title;
-                                  // final String description;
-                                  // final Color color;
-                                  // final String img;
-                                  // final String songUrl;
-                                  // ),
-                                ),
-                              ),
-                            );
-                          },
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 14),
-                                child: Container(
-                                  width: 120,
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                      image: AssetImage(album.imageUrl),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 14),
-                                child: SizedBox(
-                                  width: 120,
-                                  child: Center(
-                                    child: Text(
-                                      album.name,
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                  // SizedBox(
+                  //   height: 150,
+                  //   child: ListView.builder(
+                  //     padding: EdgeInsets.zero,
+                  //     scrollDirection: Axis.horizontal,
+                  //     itemCount: albums.length,
+                  //     itemBuilder: (BuildContext context, int index) {
+                  //       final album = albums[index];
+                  //       return GestureDetector(
+                  //         onTap: () {
+                  //           // Navegar para a página do reprodutor de música
+                  //           // print( 'Tocando ${album.name}, do ${album.imageUrl}');
+                  //           Navigator.push(
+                  //             context,
+                  //             MaterialPageRoute(
+                  //               builder: (context) =>
+                  //                   // MusicDetailPage(), // AudioPlayerSreen(),
+                  //                   MusicDetailPage(
+                  //                 musicID: album.id,
+                  //                 title: album.name,
+                  //                 description: "Wizkid",
+                  //                 color: Colors.black,
+                  //                 img: album.imageUrl,
+                  //                 songUrl: "assets/audio/gym.mp3",
+                  //                 // final String title;
+                  //                 // final String description;
+                  //                 // final Color color;
+                  //                 // final String img;
+                  //                 // final String songUrl;
+                  //                 // ),
+                  //               ),
+                  //             ),
+                  //           );
+                  //         },
+                  //         child: Column(
+                  //           children: [
+                  //             Padding(
+                  //               padding: const EdgeInsets.only(left: 14),
+                  //               child: Container(
+                  //                 width: 120,
+                  //                 height: 120,
+                  //                 decoration: BoxDecoration(
+                  //                   borderRadius: BorderRadius.circular(8),
+                  //                   image: DecorationImage(
+                  //                     image: AssetImage(album.imageUrl),
+                  //                     fit: BoxFit.cover,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //             const SizedBox(height: 4),
+                  //             Padding(
+                  //               padding: const EdgeInsets.only(left: 14),
+                  //               child: SizedBox(
+                  //                 width: 120,
+                  //                 child: Center(
+                  //                   child: Text(
+                  //                     album.name,
+                  //                     style: const TextStyle(fontSize: 14),
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
+                  const SizedBox(height: 6),
+                  // SizedBox(
+                  //   height: 150,
+                  //   child: ListView.builder(
+                  //     padding: EdgeInsets.zero,
+                  //     scrollDirection: Axis.horizontal,
+                  //     itemCount: albums.length,
+                  //     itemBuilder: (BuildContext context, int index) {
+                  //       final album = albums[index];
+                  //       return GestureDetector(
+                  //         onTap: () {
+                  //           // Navegar para a página do reprodutor de música
+                  //           // print( 'Tocando ${album.name}, do ${album.imageUrl}');
+                  //           Navigator.push(
+                  //             context,
+                  //             MaterialPageRoute(
+                  //               builder: (context) =>
+                  //                   // MusicDetailPage(), // AudioPlayerSreen(),
+                  //                   MusicDetailPage(
+                  //                 musicID: album.id,
+                  //                 title: album.name,
+                  //                 description: "Wizkid",
+                  //                 color: Colors.black,
+                  //                 img: album.imageUrl,
+                  //                 songUrl: "assets/audio/gym.mp3",
+                  //                 // final String title;
+                  //                 // final String description;
+                  //                 // final Color color;
+                  //                 // final String img;
+                  //                 // final String songUrl;
+                  //                 // ),
+                  //               ),
+                  //             ),
+                  //           );
+                  //         },
+                  //         child: Column(
+                  //           children: [
+                  //             Padding(
+                  //               padding: const EdgeInsets.only(left: 14),
+                  //               child: Container(
+                  //                 width: 120,
+                  //                 height: 120,
+                  //                 decoration: BoxDecoration(
+                  //                   borderRadius: BorderRadius.circular(8),
+                  //                   image: DecorationImage(
+                  //                     image: AssetImage(album.imageUrl),
+                  //                     fit: BoxFit.cover,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //             const SizedBox(height: 4),
+                  //             Padding(
+                  //               padding: const EdgeInsets.only(left: 14),
+                  //               child: SizedBox(
+                  //                 width: 120,
+                  //                 child: Center(
+                  //                   child: Text(
+                  //                     album.name,
+                  //                     style: const TextStyle(fontSize: 14),
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
                   const SizedBox(height: 6),
                 ],
               ),
@@ -1184,49 +1910,335 @@ class MySearchDelegate extends StatefulWidget {
   State<MySearchDelegate> createState() => _MySearchDelegateState();
 }
 
+// class _MySearchDelegateState extends State<MySearchDelegate> {
+//   // Result result = Result('nome', 'type', 'artists', 'coverImg', 'duration');
+//   // Result
+//   static List<Result> dummyResults = [
+//     Result('Ruben', 'Artist', 'Ruben', 'assets/images/background.jpg', '-'),
+//     Result('rui', 'Artist', 'rui', 'assets/images/background.jpg', '-'),
+//     Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+//     Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+//     Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+//     Result('Nome Music 1', 'Music', 'WEb badga', 'assets/images/background.jpg',
+//         '2:10min'),
+//     Result('Nome Music 2', 'Music', 'Red', 'assets/images/background.jpg',
+//         '3:10min'),
+//     Result('Nome Music 3', 'Music', 'Green & Ruben',
+//         'assets/images/background.jpg', '4:10min'),
+//     Result('Nome Music 4', 'Music', 'Blue', 'assets/images/background.jpg',
+//         '5:10min'),
+//     Result('Ruben', 'Artist', 'Ruben', 'assets/images/background.jpg', '-'),
+//     Result('rui', 'Artist', 'rui', 'assets/images/background.jpg', '-'),
+//     Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+//     // Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
+//   ];
+//   // https://www.youtube.com/watch?v=jFHSkfjN96I
+//   List<Result> display_results = [];
+//   void updateList(String value) {
+//     if (mounted) {
+//       setState(() {
+//         display_results = dummyResults
+//             .where((element) =>
+//                 element.nome.toLowerCase().contains(value.toLowerCase()))
+//             .toList();
+//       });
+//     }
+//   }
+//   void clearList() {
+//     if (mounted) {
+//       setState(() {
+//         display_results = [];
+//       });
+//     }
+//   }
+// @override
+// Widget build(BuildContext context) {
+//   return Scaffold(
+//     appBar: AppBar(
+//         bottom: PreferredSize(
+//           preferredSize:
+//               const Size.fromHeight(1.0), // Set the height of the border
+//           child: Container(
+//             decoration: const BoxDecoration(
+//               border: Border(
+//                 bottom: BorderSide(
+//                   color: Color.fromARGB(
+//                       255, 122, 122, 122), // Set the color of the border
+//                   width: 1.0, // Set the width of the border
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//         // toolbarHeight: 120,
+//         automaticallyImplyLeading: false,
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//         titleSpacing: 0.0,
+//         leading: IconButton(
+//           onPressed: () {
+//             // showSearch(context: context, delegate: CustomSearchDelegate());
+//             Navigator.pop(context);
+//           },
+//           icon: const Icon(
+//             Icons.arrow_back,
+//             color: Colors.black,
+//             // backgroundColor: Colors.red,
+//           ),
+//         ),
+//         title: TextField(
+//           onChanged: (value) => updateList(value),
+//           autofocus: true,
+//           style: const TextStyle(
+//             color: Colors.black,
+//             fontSize: 16,
+//             // remove the underline
+//             decoration: TextDecoration.none,
+//             fontWeight: FontWeight.bold,
+//           ),
+//           decoration: const InputDecoration(
+//             border: InputBorder.none,
+//             focusedBorder: InputBorder.none,
+//             enabledBorder: InputBorder.none,
+//             errorBorder: InputBorder.none,
+//             disabledBorder: InputBorder.none,
+//             // filled: true,
+//             // fillColor: Color.fromARGB(255, 187, 22, 22),
+//             // border: InputBorder.none,
+//             hintText: 'O que queres ouvir?',
+//             hintStyle: TextStyle(
+//               color: Colors.black,
+//               fontSize: 16,
+//               // bold
+//               fontWeight: FontWeight.bold,
+//             ),
+//             // border: InputBorder.none,
+//             // prefixIcon: Icon(Icons.arrow_back, color: Colors.black),
+//             // prefixIconConstraints: BoxConstraints(
+//             //   minWidth: 50,
+//             //   minHeight: 50,
+//             // ),
+//             // border: OutlineInputBorder(
+//             //   borderRadius: BorderRadius.all(Radius.circular(8.0)),
+//             //   borderSide: BorderSide.none,
+//             //   // borderSide: BorderSide(
+//             //   //   color: Color.fromARGB(0, 16, 16, 16),
+//             //   //   width: 1,
+//             //   // ),
+//             // ),
+//             // suffixIcon: IconButton(
+//             //   onPressed: () {
+//             //     // showSearch(context: context, delegate: CustomSearchDelegate());
+//             //   },
+//             //   icon: const Icon(Icons.clear, color: Colors.black),
+//             // ),
+//           ),
+//         ),
+//         actions: [
+//           IconButton(
+//             onPressed: () {
+//               // showSearch(context: context, delegate: CustomSearchDelegate());
+//               // clear the search
+//               clearList();
+//               // updateList('');
+//             },
+//             icon: const Icon(Icons.clear, color: Colors.black),
+//           ),
+//         ],
+//       ),
+//       body: Column(
+//         children: [
+//           const SizedBox(
+//             height: 5.0,
+//           ),
+//           Expanded(
+//             child: display_results.length == 0
+//                 ? const Center(
+//                     child: Text('No results Found',
+//                         style: TextStyle(
+//                           color: Colors.black,
+//                           fontWeight: FontWeight.bold,
+//                           fontSize: 22,
+//                           // backgroundColor: Colors.red,
+//                           // print('No results Found'),
+//                         )),
+//                   )
+//                 : ListView.builder(
+//                     itemCount: display_results.length,
+//                     itemBuilder: (context, index) => ListTile(
+//                       // backgroundColor: Colors.black,
+//                       contentPadding: const EdgeInsets.symmetric(
+//                           horizontal: 10.0, vertical: 0.0),
+//                       onTap: () {
+//                         // Navigator.push(
+//                         //   context,
+//                         //   MaterialPageRoute(
+//                         //     builder: (context) => MusicPlayer(),
+//                         //   ),
+//                         // );
+//                       },
+//                       title: Text(display_results[index].nome,
+//                           style: const TextStyle(
+//                             color: Colors.black,
+//                             fontWeight: FontWeight.bold,
+//                             fontSize: 14,
+//                           )),
+//                       subtitle: Text(
+//                           '${display_results[index].nome} : ${display_results[index].artist}',
+//                           style: const TextStyle(
+//                             color: Colors.black87,
+//                             // backgroundColor: Colors.black,
+//                             // fontWeight: FontWeight.bold,
+//                             fontSize: 12,
+//                           )),
+//                       // trailing: Text(display_results[index].duration,
+//                       // style: const TextStyle(
+//                       // color: Colors.black87,
+//                       // fontWeight: FontWeight.bold,
+//                       //  )),
+//                       leading: Image(
+//                         image: AssetImage(display_results[index].coverImg),
+//                         // image: AssetImage('assets/icons/google.png'),
+//                         fit: BoxFit.cover,
+//                         height: 60,
+//                         width: 60,
+//                         // color: Colors.black,
+//                         // colorBlendMode: BlendMode.darken,
+//                         // For asset images
+//                       ),
+//                     ),
+//                   ),
+//           )
+//         ],
+//       ),
+//     );
+//   }
+// }
+
 class _MySearchDelegateState extends State<MySearchDelegate> {
-  // Result result = Result('nome', 'type', 'artists', 'coverImg', 'duration');
-  // Result
-  static List<Result> dummyResults = [
-    Result('Ruben', 'Artist', 'Ruben', 'assets/images/background.jpg', '-'),
-    Result('rui', 'Artist', 'rui', 'assets/images/background.jpg', '-'),
-    Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
-    Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
-    Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
-    Result('Nome Music 1', 'Music', 'WEb badga', 'assets/images/background.jpg',
-        '2:10min'),
-    Result('Nome Music 2', 'Music', 'Red', 'assets/images/background.jpg',
-        '3:10min'),
-    Result('Nome Music 3', 'Music', 'Green & Ruben',
-        'assets/images/background.jpg', '4:10min'),
-    Result('Nome Music 4', 'Music', 'Blue', 'assets/images/background.jpg',
-        '5:10min'),
-    Result('Ruben', 'Artist', 'Ruben', 'assets/images/background.jpg', '-'),
-    Result('rui', 'Artist', 'rui', 'assets/images/background.jpg', '-'),
-    Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
-    // Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
-  ];
-  // https://www.youtube.com/watch?v=jFHSkfjN96I
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, String>> _searchResults = [];
+  bool _isSearching = false;
+  Timer? _searchDebouncer;
 
-  List<Result> display_results = [];
-
-  void updateList(String value) {
+  void _performSearch(String searchText) {
     if (mounted) {
       setState(() {
-        display_results = dummyResults
-            .where((element) =>
-                element.nome.toLowerCase().contains(value.toLowerCase()))
-            .toList();
+        _isSearching = true;
       });
+    }
+
+    Future.delayed(const Duration(seconds: 1), () {
+      AuthService().searchterm(searchText).then((results) {
+        if (mounted) {
+          setState(() {
+            _searchResults = results;
+            _isSearching = false;
+          });
+        }
+      });
+
+      // setState(() {
+      //   // _searchResults = allResults;
+      //   _searchResults = [
+      //     'Resultado 1',
+      //     'Resultado 2',
+      //     'Resultado 3',
+      //   ];
+      //   _isSearching = false;
+      // });
+    });
+  }
+
+  void _updateSearchResults(String searchText) {
+    if (searchText.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _searchResults = [];
+        });
+      }
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isSearching = true;
+      });
+    }
+
+    if (_searchDebouncer != null && _searchDebouncer!.isActive) {
+      _searchDebouncer!.cancel();
+    }
+
+    _searchDebouncer = Timer(Duration(milliseconds: 300), () {
+      _performSearch(searchText); // searchText
+    });
+  }
+
+  Widget getImage(String imageUrl) {
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      print("Image URL: ruben");
+      try {
+        print('left------------------');
+        return Container(
+          width: 70, // Defina a largura desejada
+          height: 130, // Defina a altura desejada
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit
+                .cover, // Ajuste o modo de ajuste da imagem (cover, contain, etc.)
+          ),
+        );
+      } catch (e) {
+        print('Error loading image: $e');
+        return Container(
+          width: 50,
+          height: 50,
+          color: Colors.grey,
+          child: const Icon(
+            Icons.image_not_supported,
+            color: Colors.white,
+          ),
+        );
+      }
+    } else {
+      try {
+        print('Right------------------');
+        return Container(
+          width: 60,
+          height: 140,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              imageUrl,
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      } catch (e) {
+        print('Error loading image: $e');
+        return Container(
+          width: 60,
+          height: 140,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              // playstore.png,
+              "assets/images/playstore.png",
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      }
     }
   }
 
-  void clearList() {
-    if (mounted) {
-      setState(() {
-        display_results = [];
-      });
-    }
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchDebouncer?.cancel();
+
+    super.dispose();
   }
 
   @override
@@ -1241,31 +2253,34 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
               border: Border(
                 bottom: BorderSide(
                   color: Color.fromARGB(
-                      255, 122, 122, 122), // Set the color of the border
+                      255, 141, 141, 141), // Set the color of the border
                   width: 1.0, // Set the width of the border
                 ),
               ),
             ),
           ),
         ),
-        // toolbarHeight: 120,
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         titleSpacing: 0.0,
         leading: IconButton(
           onPressed: () {
-            // showSearch(context: context, delegate: CustomSearchDelegate());
             Navigator.pop(context);
           },
           icon: const Icon(
             Icons.arrow_back,
             color: Colors.black,
-            // backgroundColor: Colors.red,
           ),
         ),
         title: TextField(
-          onChanged: (value) => updateList(value),
+          controller: _searchController,
+          onChanged: (value) {
+            _updateSearchResults(value);
+          },
+          onSubmitted: (value) {
+            _performSearch(value);
+          },
           autofocus: true,
           style: const TextStyle(
             color: Colors.black,
@@ -1275,120 +2290,137 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
             decoration: TextDecoration.none,
             fontWeight: FontWeight.bold,
           ),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
+            // filled: true,
+            // fillColor: Colors.grey[600], // Cor de fundo
             border: InputBorder.none,
             focusedBorder: InputBorder.none,
             enabledBorder: InputBorder.none,
             errorBorder: InputBorder.none,
             disabledBorder: InputBorder.none,
-            // filled: true,
-            // fillColor: Color.fromARGB(255, 187, 22, 22),
-            // border: InputBorder.none,
-            hintText: 'O que queres ouvir?',
-            hintStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              // bold
-              fontWeight: FontWeight.bold,
+            hintText: 'Search on your library...',
+            contentPadding: EdgeInsets.symmetric(vertical: 14.0),
+            suffixIcon: IconButton(
+              onPressed: () {
+                if (mounted) {
+                  setState(() {
+                    _searchController.clear();
+                    _updateSearchResults('');
+                  });
+                }
+              },
+              icon: const Icon(
+                Icons.clear,
+                color: Colors.black,
+              ),
             ),
-            // border: InputBorder.none,
-            // prefixIcon: Icon(Icons.arrow_back, color: Colors.black),
-            // prefixIconConstraints: BoxConstraints(
-            //   minWidth: 50,
-            //   minHeight: 50,
-            // ),
-            // border: OutlineInputBorder(
-            //   borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            //   borderSide: BorderSide.none,
-            //   // borderSide: BorderSide(
-            //   //   color: Color.fromARGB(0, 16, 16, 16),
-            //   //   width: 1,
-            //   // ),
-            // ),
-            // suffixIcon: IconButton(
-            //   onPressed: () {
-            //     // showSearch(context: context, delegate: CustomSearchDelegate());
-            //   },
-            //   icon: const Icon(Icons.clear, color: Colors.black),
-            // ),
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // showSearch(context: context, delegate: CustomSearchDelegate());
-              // clear the search
-              clearList();
-              // updateList('');
-            },
-            icon: const Icon(Icons.clear, color: Colors.black),
-          ),
-        ],
       ),
       body: Column(
         children: [
-          const SizedBox(
-            height: 5.0,
-          ),
           Expanded(
-            child: display_results.length == 0
+            child: _isSearching
                 ? const Center(
-                    child: Text('No results Found',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
-                          // backgroundColor: Colors.red,
-                          // print('No results Found'),
-                        )),
+                    child: CircularProgressIndicator(),
                   )
-                : ListView.builder(
-                    itemCount: display_results.length,
-                    itemBuilder: (context, index) => ListTile(
-                      // backgroundColor: Colors.black,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 0.0),
-                      onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => MusicPlayer(),
-                        //   ),
-                        // );
-                      },
-                      title: Text(display_results[index].nome,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          )),
-                      subtitle: Text(
-                          '${display_results[index].nome} : ${display_results[index].artist}',
-                          style: const TextStyle(
-                            color: Colors.black87,
-                            // backgroundColor: Colors.black,
-                            // fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          )),
-                      // trailing: Text(display_results[index].duration,
-                      // style: const TextStyle(
-                      // color: Colors.black87,
-                      // fontWeight: FontWeight.bold,
-                      //  )),
-                      leading: Image(
-                        image: AssetImage(display_results[index].coverImg),
-                        // image: AssetImage('assets/icons/google.png'),
-                        fit: BoxFit.cover,
-                        height: 60,
-                        width: 60,
-                        // color: Colors.black,
-                        // colorBlendMode: BlendMode.darken,
+                : _searchResults.isEmpty
+                    ? _searchController.text.isEmpty
+                        ? const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Encontra os teus preferidos",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  "Procura tudo: artistas, musicas e playlists",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  // color: Colors.amber,
+                                  constraints: const BoxConstraints(
+                                    maxWidth:
+                                        270, // Defina o tamanho máximo de largura desejado
+                                  ),
+                                  child: Text(
+                                    "Could not find any results of '${_searchController.text.isNotEmpty ? _searchController.text + "'" : "' your search"}",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  // color: Colors.blue,
+                                  constraints: const BoxConstraints(
+                                    maxWidth:
+                                        270, // Defina o tamanho máximo de largura desejado
+                                  ),
+                                  child: const Text(
+                                    // central text
 
-                        // For asset images
+                                    "Try searching again with a different \nterm or keyword",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                    : ListView.builder(
+                        itemCount: _searchResults.length,
+                        itemBuilder: (context, index) {
+                          final r = _searchResults[index];
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 3.0, horizontal: 16.0),
+                            leading: getImage(
+                              r['image'] ?? 'image default',
+                            ),
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  r['title'] ?? 'title default',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  r['type'] ?? 'type default',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    ),
-                  ),
-          )
+          ),
         ],
       ),
     );
@@ -2203,19 +3235,19 @@ class _LibraryPageState extends State<LibraryPage> {
                                 final data = musicas[index];
                                 return GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MusicDetailPage(
-                                          musicID: data['id'],
-                                          title: data['title'],
-                                          description: data['description'],
-                                          color: Colors.black,
-                                          img: data['imageUrl'],
-                                          songUrl: "assets/audio/gym.mp3",
-                                        ),
-                                      ),
-                                    );
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder: (context) => MusicDetailPage(
+                                    //       musicID: data['id'],
+                                    //       title: data['title'],
+                                    //       description: data['description'],
+                                    //       color: Colors.black,
+                                    //       img: data['imageUrl'],
+                                    //       songUrl: "assets/audio/gym.mp3",
+                                    //     ),
+                                    //   ),
+                                    // );
                                   },
                                   child: Container(
                                     // color: Colors.yellow,
@@ -2301,19 +3333,19 @@ class _LibraryPageState extends State<LibraryPage> {
                                   padding: const EdgeInsets.only(bottom: 6.0),
                                   child: GestureDetector(
                                     onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => MusicDetailPage(
-                                            musicID: data['id'],
-                                            title: data['title'],
-                                            description: data['description'],
-                                            color: Colors.black,
-                                            img: data['imageUrl'],
-                                            songUrl: "assets/audio/gym.mp3",
-                                          ),
-                                        ),
-                                      );
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) => MusicDetailPage(
+                                      //       musicID: data['id'],
+                                      //       title: data['title'],
+                                      //       description: data['description'],
+                                      //       color: Colors.black,
+                                      //       img: data['imageUrl'],
+                                      //       songUrl: "assets/audio/gym.mp3",
+                                      //     ),
+                                      //   ),
+                                      // );
                                     },
                                     child: Container(
                                       // color: Colors.red,
@@ -2490,11 +3522,9 @@ class _LibraryPageState extends State<LibraryPage> {
 // MySearchDelegate
 // class MySearchLibrary extends StatefulWidget {
 //   const MySearchLibrary({Key? key}) : super(key: key);
-
 //   @override
 //   State<MySearchLibrary> createState() => _MySearchLibraryState();
 // }
-
 // class _MySearchLibraryState extends State<MySearchLibrary> {
 //   // Result result = Result('nome', 'type', 'artists', 'coverImg', 'duration');
 //   // Result
@@ -2518,9 +3548,7 @@ class _LibraryPageState extends State<LibraryPage> {
 //     // Result('Rita', 'Artist', 'Rita', 'assets/images/background.jpg', '-'),
 //   ];
 //   // https://www.youtube.com/watch?v=jFHSkfjN96I
-
 //   List<Result> display_results = [];
-
 //   void updateList(String value) {
 //     if (mounted) {
 //       setState(() {
@@ -2531,7 +3559,6 @@ class _LibraryPageState extends State<LibraryPage> {
 //       });
 //     }
 //   }
-
 //   void clearList() {
 //     if (mounted) {
 //       setState(() {
@@ -2539,7 +3566,6 @@ class _LibraryPageState extends State<LibraryPage> {
 //       });
 //     }
 //   }
-
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
@@ -2693,7 +3719,6 @@ class _LibraryPageState extends State<LibraryPage> {
 //                         width: 60,
 //                         // color: Colors.black,
 //                         // colorBlendMode: BlendMode.darken,
-
 //                         // For asset images
 //                       ),
 //                     ),
@@ -2716,7 +3741,6 @@ class MySearchLibrary extends StatefulWidget {
 // class _MySearchLibraryState extends State<MySearchLibrary> {
 //   String _searchText = '';
 //   List<String> _searchResults = [];
-
 //   void _performSearch() {
 //     // Aqui você pode implementar a lógica para enviar uma solicitação de pesquisa
 //     // com o texto digitado na barra de pesquisa (_searchText).
@@ -2730,7 +3754,6 @@ class MySearchLibrary extends StatefulWidget {
 //       ];
 //     });
 //   }
-
 //   void _applyFilter(String filter) {
 //     setState(() {
 //       // Aqui você pode implementar a lógica para aplicar o filtro selecionado aos resultados da pesquisa.
@@ -2739,7 +3762,6 @@ class MySearchLibrary extends StatefulWidget {
 //           _searchResults.where((result) => result.contains(filter)).toList();
 //     });
 //   }
-
 //   void _updateSearchResults(String searchText) {
 //     setState(() {
 //       if (searchText.isEmpty) {
@@ -2757,7 +3779,6 @@ class MySearchLibrary extends StatefulWidget {
 //       }
 //     });
 //   }
-
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
@@ -2873,7 +3894,6 @@ class MySearchLibrary extends StatefulWidget {
 //     );
 //   }
 // }
-
 // import 'package:flutter/material.dart';
 
 class _MySearchLibraryState extends State<MySearchLibrary> {
@@ -2884,16 +3904,20 @@ class _MySearchLibraryState extends State<MySearchLibrary> {
   // String _filter = '';
 
   void _performSearch(String searchText) {
-    setState(() {
-      _isSearching = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isSearching = true;
+      });
+    }
 
     Future.delayed(const Duration(seconds: 1), () {
       AuthService().searchtermLibrary(searchText).then((results) {
-        setState(() {
-          _searchResults = results;
-          _isSearching = false;
-        });
+        if (mounted) {
+          setState(() {
+            _searchResults = results;
+            _isSearching = false;
+          });
+        }
       });
 
       // setState(() {
@@ -2919,15 +3943,19 @@ class _MySearchLibraryState extends State<MySearchLibrary> {
 
   void _updateSearchResults(String searchText) {
     if (searchText.isEmpty) {
-      setState(() {
-        _searchResults = [];
-      });
+      if (mounted) {
+        setState(() {
+          _searchResults = [];
+        });
+      }
       return;
     }
 
-    setState(() {
-      _isSearching = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isSearching = true;
+      });
+    }
 
     if (_searchDebouncer != null && _searchDebouncer!.isActive) {
       _searchDebouncer!.cancel();
@@ -2960,11 +3988,25 @@ class _MySearchLibraryState extends State<MySearchLibrary> {
   // }
 
   Widget getImage(String imageUrl) {
-    // print("Image URL: " + imageUrl);
+    // print(
+    //     "Image URL: Image URL: Image URL: Image URL: Image URL: Image URL: Image URL: " +
+    // imageUrl);
+    // bool isValid = await AuthService().isAssetPathValid(imageUrl);
+    // if (!isValid) {
+    //   return Container(
+    //     width: 50,
+    //     height: 50,
+    //     color: Colors.grey,
+    //     child: const Icon(
+    //       Icons.image_not_supported,
+    //       color: Colors.white,
+    //     ),
+    //   );
+    // }
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
       print("Image URL: ruben");
       try {
-        print(imageUrl.startsWith('http://'));
+        print('left------------------');
         return Container(
           width: 70, // Defina a largura desejada
           height: 130, // Defina a altura desejada
@@ -2988,13 +4030,16 @@ class _MySearchLibraryState extends State<MySearchLibrary> {
       }
     } else {
       try {
+        print('Right------------------');
         return Container(
-          width: 70, // Defina a largura desejada
-          height: 130, // Defina a altura desejada
-          child: Image.asset(
-            imageUrl,
-            fit: BoxFit
-                .cover, // Ajuste o modo de ajuste da imagem (cover, contain, etc.)
+          width: 60,
+          height: 140,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              imageUrl,
+              fit: BoxFit.cover,
+            ),
           ),
         );
       } catch (e) {
@@ -3083,10 +4128,12 @@ class _MySearchLibraryState extends State<MySearchLibrary> {
             contentPadding: EdgeInsets.symmetric(vertical: 14.0),
             suffixIcon: IconButton(
               onPressed: () {
-                setState(() {
-                  _searchController.clear();
-                  _updateSearchResults('');
-                });
+                if (mounted) {
+                  setState(() {
+                    _searchController.clear();
+                    _updateSearchResults('');
+                  });
+                }
               },
               icon: const Icon(
                 Icons.clear,
@@ -3170,24 +4217,26 @@ class _MySearchLibraryState extends State<MySearchLibrary> {
                     : ListView.builder(
                         itemCount: _searchResults.length,
                         itemBuilder: (context, index) {
-                          final result = _searchResults[index];
+                          final r = _searchResults[index];
                           return ListTile(
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                                 vertical: 3.0, horizontal: 16.0),
-                            leading: getImage(result['image'] ?? ''),
+                            leading: getImage(
+                              r['musicImage'] ?? 'image default',
+                            ),
                             //Image.network(result['image'] ?? ''),
                             title: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  result['title'] ?? 'title default',
+                                  r['musicTitle'] ?? 'title default',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
-                                  result['type'] ?? 'type default',
+                                  r['description'] ?? 'type default',
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
@@ -3286,8 +4335,8 @@ class _NewPlaylistPageState extends State<NewPlaylistPage> {
               onPressed: () {
                 // Lógica a ser executada quando o botão "OK" for pressionado
                 final playlistName = playlistController.text;
-                AuthService()
-                    .createPlaylist(playlistName, "Other", "playlistImage");
+                AuthService().createPlaylist(
+                    playlistName, "Other", "assets/images/playstore.png");
 
                 Navigator.pop(context);
                 Navigator.pop(context);
@@ -4036,22 +5085,23 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void getmyplaylist() {
     // Adicionar informacoes as musicas
-    if (mounted) {
-      // AuthService().uploadMusic(
-      //   " title 1",
-      //   "assets/images/cover.jpg",
-      //   "ruben descrition",
-      //   5,
-      // );
-      // AuthService().getPlaylist().then((value) {  //HERE
-      //   print(value);
-      // });
-      AuthService().getPlaylist().then((value) {
+    // if (mounted) {
+    // AuthService().uploadMusic(
+    //   " title 1",
+    //   "assets/images/cover.jpg",
+    //   "ruben descrition",
+    //   5,
+    // );
+    // AuthService().getPlaylist().then((value) {  //HERE
+    //   print(value);
+    // });
+    AuthService().getPlaylist().then((value) {
+      if (mounted) {
         setState(() {
           myPlaylist = value;
         });
-      });
-    }
+      }
+    });
   }
 
   void setCursorAtEnd() {
@@ -4065,14 +5115,21 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void getProfileInfo() {
-    if (mounted) {
-      AuthService().getUserProfile().then((value) {
+    AuthService().getUserProfile().then((value) {
+      if (mounted) {
+        setState(() {
+          userProfile = value;
+          // bio = userProfile['bio'];
+          // bioController.text = bio;
+        });
+      }
+      if (mounted) {
         setState(() {
           userProfile = value;
           // Atualizar o valor do TextField
         });
-      });
-    }
+      }
+    });
   }
 
   String getButtonText() {
@@ -4381,19 +5438,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                   final data = myPlaylist[index];
                                   return GestureDetector(
                                     onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => MusicDetailPage(
-                                            musicID: data['id'],
-                                            title: data['title'],
-                                            description: data['description'],
-                                            color: Colors.black,
-                                            img: data['imageUrl'],
-                                            songUrl: "assets/audio/gym.mp3",
-                                          ),
-                                        ),
-                                      );
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) => MusicDetailPage(
+                                      //       musicID: data['id'],
+                                      //       title: data['title'],
+                                      //       description: data['description'],
+                                      //       color: Colors.black,
+                                      //       img: data['imageUrl'],
+                                      //       songUrl: "assets/audio/gym.mp3",
+                                      //     ),
+                                      //   ),
+                                      // );
                                     },
                                     child: Container(
                                       child: Column(

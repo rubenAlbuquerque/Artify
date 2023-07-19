@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 // import 'package:file_picker/file_picker.dart';
 // import 'package::file_picker/file_picker.dart';
-
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
@@ -636,6 +636,15 @@ class AuthService {
   //     return filteredResults;
   //   }
   // }
+  Future<bool> isAssetPathValid(String assetPath) async {
+    try {
+      await rootBundle.load(assetPath);
+      return true;
+    } catch (e) {
+      print('Invalid asset path: $assetPath');
+      return false;
+    }
+  }
 
   Future<List<Map<String, String>>> searchtermLibrary(String term) async {
     final playlist = FirestoreService('playlists');
@@ -675,6 +684,7 @@ class AuthService {
         if (musicData != null) {
           final musicTitle = musicData['title'] as String?;
           final musicImage = musicData['imageUrl'] as String?;
+          final musicDescription = musicData['description'] as String?;
 
           if (musicTitle != null && musicImage != null) {
             if (musicIds.contains(musicId)) {
@@ -687,11 +697,167 @@ class AuthService {
                 'musicId': musicId,
                 'musicTitle': musicTitle,
                 'musicImage': musicImage,
+                'description': musicDescription ?? '',
               };
+
+              print('result: $result');
 
               allResults.add(result);
             }
           }
+        }
+      }
+    }
+
+    return allResults;
+  }
+
+  Future<List<Map<String, String>>> Playlists(String term) async {
+    final playlist = FirestoreService('playlists');
+    final musicService = FirestoreService('music');
+
+    final QuerySnapshot playlistQuerySnapshot =
+        await playlist._collection.where('type', isEqualTo: 'playlist').get();
+
+    final List<Map<String, String>> allResults = [];
+
+    if (playlistQuerySnapshot.docs.isNotEmpty) {
+      final playlistDoc = playlistQuerySnapshot.docs[0];
+      final playlistId = playlistDoc.id;
+
+      final List<dynamic> musicReferences =
+          playlistDoc['songs'] as List<dynamic>;
+
+      final List<String> musicIds = [];
+
+      for (final reference in musicReferences) {
+        final String musicId = reference.id;
+        musicIds.add(musicId);
+      }
+
+      // final QuerySnapshot musicQuerySnapshot =
+      //     await musicService._collection.whereIn('id', musicIds).get();
+
+      final QuerySnapshot musicQuerySnapshot = await musicService._collection
+          // .where('id', whereIn: musicIds)
+          // .where('title', isGreaterThanOrEqualTo: term)
+          .get();
+
+      for (final musicDoc in musicQuerySnapshot.docs) {
+        final musicId = musicDoc.id;
+        final musicData = musicDoc.data() as Map<String, dynamic>?;
+
+        if (musicData != null) {
+          final musicTitle = musicData['title'] as String?;
+          final musicImage = musicData['imageUrl'] as String?;
+          final musicDescription = musicData['description'] as String?;
+
+          if (musicTitle != null && musicImage != null) {
+            if (musicIds.contains(musicId)) {
+              print('musicId: $musicId');
+              print('musicTitle: $musicTitle');
+              print('musicImage: $musicImage');
+
+              final result = {
+                'playlistId': playlistId,
+                'musicId': musicId,
+                'musicTitle': musicTitle,
+                'musicImage': musicImage,
+                'description': musicDescription ?? '',
+              };
+
+              print('result: $result');
+
+              allResults.add(result);
+            }
+          }
+        }
+      }
+    }
+
+    return allResults;
+  }
+
+  // recumendacoes e populares
+  Future<List<Map<String, String>>> recumendacoes() async {
+    // obter todas as informacoes das musicas
+
+    final musicService = FirestoreService('music');
+
+    final QuerySnapshot musicQuerySnapshot = await musicService._collection
+        // .where('id', whereIn: musicIds)
+        // .where('title', isGreaterThanOrEqualTo: term)
+        .get();
+
+    final List<Map<String, String>> allResults = [];
+
+    for (final musicDoc in musicQuerySnapshot.docs) {
+      final musicId = musicDoc.id;
+      final musicData = musicDoc.data() as Map<String, dynamic>?;
+
+      if (musicData != null) {
+        final musicTitle = musicData['title'] as String?;
+        final musicImage = musicData['imageUrl'] as String?;
+        final musicDescription = musicData['description'] as String?;
+
+        if (musicTitle != null && musicImage != null) {
+          // print('musicId: $musicId');
+          // print('musicTitle: $musicTitle');
+          // print('musicImage: $musicImage');
+
+          final result = {
+            'musicId': musicId,
+            'musicTitle': musicTitle,
+            'musicImage': musicImage,
+            'description': musicDescription ?? '',
+          };
+
+          // print('result: $result');
+
+          allResults.add(result);
+        }
+      }
+    }
+
+    return allResults;
+  }
+
+  // obter todas as informacoes das ,musicas e ordenar por likes (populares)
+  Future<List<Map<String, String>>> populares() async {
+    final musicService = FirestoreService('music');
+
+    final QuerySnapshot musicQuerySnapshot = await musicService._collection
+        // .where('id', whereIn: musicIds)
+        // .where('title', isGreaterThanOrEqualTo: term)
+        .orderBy('likes', descending: true)
+        .get();
+
+    final List<Map<String, String>> allResults = [];
+
+    for (final musicDoc in musicQuerySnapshot.docs) {
+      final musicId = musicDoc.id;
+      final musicData = musicDoc.data() as Map<String, dynamic>?;
+
+      if (musicData != null) {
+        final musicTitle = musicData['title'] as String?;
+        final musicImage = musicData['imageUrl'] as String?;
+        final musicDescription = musicData['description'] as String?;
+
+        if (musicTitle != null && musicImage != null) {
+          // print('musicId: $musicId');
+          // print('musicTitle: $musicTitle');
+          // print('musicImage: $musicImage');
+
+          final result = {
+            'musicId': musicId,
+            'musicTitle': musicTitle,
+            'musicImage': musicImage,
+            'description': musicDescription ?? '',
+          };
+
+          // print('result: $result');
+
+          allResults.add(result);
         }
       }
     }
