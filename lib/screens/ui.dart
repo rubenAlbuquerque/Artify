@@ -885,8 +885,8 @@ class _SearchState extends State<SearchPage> {
       try {
         print('Right------------------');
         return Container(
-          width: 60,
-          height: 140,
+          width: 110,
+          height: 110,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image.asset(
@@ -1128,7 +1128,7 @@ class _SearchState extends State<SearchPage> {
             children: [
               Column(
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 14),
                     child: Align(
                       alignment: Alignment.centerLeft, // Alinhar à esquerda
@@ -1136,7 +1136,7 @@ class _SearchState extends State<SearchPage> {
                         padding: EdgeInsets.symmetric(vertical: 5),
                         // Adicionar padding vertical
                         child: Text(
-                          'New Albums',
+                          'Recommended for you',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -1145,541 +1145,80 @@ class _SearchState extends State<SearchPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 8),
+                  // const SizedBox(height: 2),
                   Container(
-                    color: const Color.fromARGB(255, 183, 59, 59),
-                    height: 300, // Altura fixa para o ListView.builder
+                    // color: Color.fromARGB(255, 43, 38, 38),
+                    height: 200, // Altura fixa para o ListView.builder
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: recumendations.length,
                       itemBuilder: (context, index) {
                         final r = recumendations[index];
                         return SizedBox(
-                          width:
-                              200, // Largura máxima do item do ListView.builder
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 3.0,
-                              horizontal: 16.0,
-                            ),
-                            leading:
-                                getImage(r['musicImage'] ?? 'image default'),
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: 8),
-                                Text(
-                                  r['musicTitle'] ?? 'title default',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                            width: 110,
+                            child: GestureDetector(
+                              onTap: () {
+                                // Ação a ser executada ao pressionar o Container
+                                // print('Container pressionado!');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MusicDetailPage(
+                                      musicID: r['musicId'] ?? 'unknown id',
+                                      title: r['musicTitle'] ?? 'unknown title',
+                                      description: r['description'] ??
+                                          'unknown description',
+                                      color: Colors.black,
+                                      img: r['musicImage'] ?? 'unknown image',
+                                      songUrl: "assets/audio/gym.mp3",
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                // color: Colors.blue,
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 1.0,
+                                    horizontal: 4.0,
+                                  ),
+                                  title: Container(
+                                    // color: Colors.yellow,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        getImage(r['musicImage'] ??
+                                            'image default'), // Imagem adicionada no topo
+                                        SizedBox(height: 4),
+                                        Text(
+                                          r['musicTitle'] ?? 'title default',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(height: 2),
+                                        Text(
+                                          r['description'] ??
+                                              'description default',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                                SizedBox(height: 4),
-                                Text(
-                                  r['description'] ?? 'description default',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
+                              ),
+                            ));
                       },
                     ),
                   ),
 
-                  // ListView.builder(
-                  //   itemCount: _searchResults.length,
-                  //   itemBuilder: (context, index) {
-                  //     final r = _searchResults[index];
-                  //     return ListTile(
-                  //       contentPadding: const EdgeInsets.symmetric(
-                  //           vertical: 3.0, horizontal: 16.0),
-                  //       leading: getImage(
-                  //         r['image'] ?? 'image default',
-                  //       ),
-                  //       title: Column(
-                  //         crossAxisAlignment: CrossAxisAlignment.start,
-                  //         children: [
-                  //           Text(
-                  //             r['title'] ?? 'title default',
-                  //             style: const TextStyle(
-                  //               fontSize: 16,
-                  //               fontWeight: FontWeight.bold,
-                  //             ),
-                  //           ),
-                  //           Text(
-                  //             r['type'] ?? 'type default',
-                  //             style: const TextStyle(
-                  //               fontSize: 14,
-                  //               color: Colors.grey,
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
-                  //
-                  // Container(
-                  //   color: Color.fromARGB(255, 94, 167, 48),
-                  //   child: TextButton(
-                  //     onPressed: () {
-                  //       // Ação quando o botão "Ver mais" for pressionado
-                  //     },
-                  //     child: FutureBuilder<List<Map<String, String>>>(
-                  //       future: recumendations,
-                  //       builder: (context, snapshot) {
-                  //         if (snapshot.hasData) {
-                  //           final List<Map<String, String>> recommendations =
-                  //               snapshot.data!;
-
-                  //           // Criar uma lista de widgets para serem exibidos na rolagem horizontal
-                  //           List<Widget> widgets = [];
-                  //           for (Map<String, String> recommendation
-                  //               in recommendations) {
-                  //             widgets.add(
-                  //               Padding(
-                  //                 padding: const EdgeInsets.all(8.0),
-                  //                 child: Column(
-                  //                   mainAxisAlignment: MainAxisAlignment.center,
-                  //                   children: [
-                  //                     Container(
-                  //                       width: 200,
-                  //                       height: 200,
-                  //                       decoration: BoxDecoration(
-                  //                         borderRadius:
-                  //                             BorderRadius.circular(10),
-                  //                         image: DecorationImage(
-                  //                           image: AssetImage(
-                  //                               recommendation['imageUrl'] ??
-                  //                                   ''),
-                  //                           fit: BoxFit.cover,
-                  //                         ),
-                  //                       ),
-                  //                     ),
-                  //                     SizedBox(height: 8),
-                  //                     Text(
-                  //                       recommendation["musicTitle"] ??
-                  //                           'Unknown',
-                  //                       style: TextStyle(
-                  //                         color: Colors.white,
-                  //                         fontSize: 16,
-                  //                         fontWeight: FontWeight.bold,
-                  //                       ),
-                  //                     ),
-                  //                     SizedBox(height: 4),
-                  //                     Text(
-                  //                       recommendation['description'] ??
-                  //                           'artist',
-                  //                       style: TextStyle(
-                  //                         color: Colors.white,
-                  //                         fontSize: 14,
-                  //                       ),
-                  //                     ),
-                  //                   ],
-                  //                 ),
-                  //               ),
-                  //             );
-                  //           }
-
-                  //           return SizedBox(
-                  //             height: 200,
-                  //             child: ListView(
-                  //               scrollDirection: Axis.horizontal,
-                  //               children: widgets,
-                  //             ),
-                  //           );
-                  //         } else if (snapshot.hasError) {
-                  //           return Text('Error: ${snapshot.error}');
-                  //         }
-                  //         // Mostrar um indicador de carregamento enquanto espera a conclusão do Future
-                  //         return Center(child: CircularProgressIndicator());
-                  //       },
-                  //     ),
-                  //   ),
-                  // ),
-
-                  // Container(
-                  //   color: Color.fromARGB(255, 94, 167, 48),
-                  //   child: TextButton(
-                  //     onPressed: () {
-                  //       // Ação quando o botão "Ver mais" é pressionado
-                  //     },
-                  //     child: FutureBuilder<List<Map<String, String>>>(
-                  //       future: recumendations,
-                  //       builder: (context, snapshot) {
-                  //         if (snapshot.hasData) {
-                  //           final List<Map<String, String>> recommendations =
-                  //               snapshot.data!;
-
-                  //           // Create a list of widgets to be displayed in the horizontal scroll
-                  //           List<Widget> widgets = [];
-                  //           for (Map<String, String> recommendation
-                  //               in recommendations) {
-                  //             widgets.add(
-                  //               Padding(
-                  //                 padding: const EdgeInsets.all(8.0),
-                  //                 child: Column(
-                  //                   mainAxisAlignment: MainAxisAlignment.center,
-                  //                   children: [
-                  //                     Container(
-                  //                       width: 200,
-                  //                       height: 200,
-                  //                       decoration: BoxDecoration(
-                  //                         borderRadius:
-                  //                             BorderRadius.circular(10),
-                  //                         image: DecorationImage(
-                  //                           image: AssetImage(
-                  //                               recommendation['imageUrl'] ??
-                  //                                   ''),
-                  //                           fit: BoxFit.cover,
-                  //                         ),
-                  //                       ),
-                  //                     ),
-                  //                     SizedBox(height: 8),
-                  //                     Text(
-                  //                       recommendation["musicTitle"] ??
-                  //                           'Unknown',
-                  //                       style: TextStyle(
-                  //                         color: Colors.white,
-                  //                         fontSize: 16,
-                  //                         fontWeight: FontWeight.bold,
-                  //                       ),
-                  //                     ),
-                  //                     SizedBox(height: 4),
-                  //                     Text(
-                  //                       recommendation['description'] ??
-                  //                           'artist',
-                  //                       style: TextStyle(
-                  //                         color: Colors.white,
-                  //                         fontSize: 14,
-                  //                       ),
-                  //                     ),
-                  //                   ],
-                  //                 ),
-                  //               ),
-                  //             );
-                  //           }
-
-                  //           return SizedBox(
-                  //             height: 200,
-                  //             child: ListView(
-                  //               scrollDirection: Axis.horizontal,
-                  //               children: widgets,
-                  //             ),
-                  //           );
-                  //         } else if (snapshot.hasError) {
-                  //           return Text('Error: ${snapshot.error}');
-                  //         }
-                  //         // Show a loading indicator while waiting for the future to complete
-                  //         return Center(child: CircularProgressIndicator());
-                  //       },
-                  //     ),
-
-                  //     // child: FutureBuilder<List<Map<String, String>>>(
-                  //     //   future: recumendations,
-                  //     //   builder: (context, snapshot) {
-                  //     //     if (snapshot.hasData) {
-                  //     //       final List<Map<String, String>> recommendations =
-                  //     //           snapshot.data!;
-                  //     //       // Create a list of widgets to be displayed in the horizontal scroll
-                  //     //       List<Widget> widgets = [];
-                  //     //       for (Map<String, String> recommendation
-                  //     //           in recommendations) {
-                  //     //         widgets.add(
-                  //     //           Padding(
-                  //     //             padding: const EdgeInsets.all(8.0),
-                  //     //             child: Column(
-                  //     //               mainAxisAlignment: MainAxisAlignment.center,
-                  //     //               children: [
-                  //     //                 Image.network(
-                  //     //                   recommendation['imageUrl'] ?? 'img',
-                  //     //                   fit: BoxFit.cover,
-                  //     //                 ),
-                  //     //                 Text(
-                  //     //                   recommendation["musicTitle"] ??
-                  //     //                       'Unknown',
-                  //     //                   style: TextStyle(
-                  //     //                     color: Colors.white,
-                  //     //                     fontSize: 16,
-                  //     //                   ),
-                  //     //                 ),
-                  //     //                 Text(
-                  //     //                   recommendation['description'] ??
-                  //     //                       'artist',
-                  //     //                   style: TextStyle(
-                  //     //                     color: Colors.white,
-                  //     //                     fontSize: 14,
-                  //     //                   ),
-                  //     //                 ),
-                  //     //               ],
-                  //     //             ),
-                  //     //           ),
-                  //     //         );
-                  //     //       }
-                  //     //       return SizedBox(
-                  //     //         height: 100,
-                  //     //         child: ListView(
-                  //     //           scrollDirection: Axis.horizontal,
-                  //     //           children: widgets,
-                  //     //         ),
-                  //     //       );
-                  //     //     } else if (snapshot.hasError) {
-                  //     //       return Text('Error: ${snapshot.error}');
-                  //     //     }
-                  //     //     // Show a loading indicator while waiting for the future to complete
-                  //     //     return CircularProgressIndicator();
-                  //     //   },
-                  //     // ),
-                  //     // child: FutureBuilder<List<Map<String, String>>>(
-                  //     //   future: recumendations,
-                  //     //   builder: (context, snapshot) {
-                  //     //     if (snapshot.hasData) {
-                  //     //       final List<Map<String, String>> recommendations =
-                  //     //           snapshot.data!;
-                  //     //       // Create a list of widgets to be displayed in the horizontal scroll
-                  //     //       List<Widget> widgets = [];
-                  //     //       for (Map<String, String> recommendation
-                  //     //           in recommendations) {
-                  //     //         widgets.add(
-                  //     //           Padding(
-                  //     //             padding: const EdgeInsets.all(8.0),
-                  //     //             child: Column(
-                  //     //               mainAxisAlignment: MainAxisAlignment.center,
-                  //     //               children: [
-                  //     //                 Container(
-                  //     //                   width: 200,
-                  //     //                   height: 200,
-                  //     //                   decoration: BoxDecoration(
-                  //     //                     borderRadius:
-                  //     //                         BorderRadius.circular(10),
-                  //     //                     image: DecorationImage(
-                  //     //                       image: NetworkImage(
-                  //     //                           recommendation['imageUrl'] ??
-                  //     //                               'img'),
-                  //     //                       fit: BoxFit.cover,
-                  //     //                     ),
-                  //     //                   ),
-                  //     //                 ),
-                  //     //                 SizedBox(height: 8),
-                  //     //                 Text(
-                  //     //                   recommendation["musicTitle"] ??
-                  //     //                       'Unknown',
-                  //     //                   style: TextStyle(
-                  //     //                     color: Colors.white,
-                  //     //                     fontSize: 16,
-                  //     //                     fontWeight: FontWeight.bold,
-                  //     //                   ),
-                  //     //                 ),
-                  //     //                 SizedBox(height: 4),
-                  //     //                 Text(
-                  //     //                   recommendation['description'] ??
-                  //     //                       'artist',
-                  //     //                   style: TextStyle(
-                  //     //                     color: Colors.white,
-                  //     //                     fontSize: 14,
-                  //     //                   ),
-                  //     //                 ),
-                  //     //               ],
-                  //     //             ),
-                  //     //           ),
-                  //     //         );
-                  //     //       }
-                  //     //       return SizedBox(
-                  //     //         height: 200,
-                  //     //         child: ListView(
-                  //     //           scrollDirection: Axis.horizontal,
-                  //     //           children: widgets,
-                  //     //         ),
-                  //     //       );
-                  //     //     } else if (snapshot.hasError) {
-                  //     //       return Text('Error: ${snapshot.error}');
-                  //     //     }
-                  //     //     // Show a loading indicator while waiting for the future to complete
-                  //     //     return Center(child: CircularProgressIndicator());
-                  //     //   },
-                  //     // ),
-                  //   ),
-                  // ),
-
-                  // ListView.builder(
-                  //   itemCount: _searchResults.length,
-                  //   itemBuilder: (context, index) {
-                  //     final r = _searchResults[index];
-                  //     return ListTile(
-                  //       contentPadding: const EdgeInsets.symmetric(
-                  //           vertical: 3.0, horizontal: 16.0),
-                  //       leading: getImage(
-                  //         r['image'] ?? 'image default',
-                  //       ),
-                  //       title: Column(
-                  //         crossAxisAlignment: CrossAxisAlignment.start,
-                  //         children: [
-                  //           Text(
-                  //             r['title'] ?? 'title default',
-                  //             style: const TextStyle(
-                  //               fontSize: 16,
-                  //               fontWeight: FontWeight.bold,
-                  //             ),
-                  //           ),
-                  //           Text(
-                  //             r['type'] ?? 'type default',
-                  //             style: const TextStyle(
-                  //               fontSize: 14,
-                  //               color: Colors.grey,
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
-
-                  // SizedBox(
-                  //   height: 150,
-                  //   child: ListView.builder(
-                  //     padding: EdgeInsets.zero,
-                  //     scrollDirection: Axis.horizontal,
-                  //     itemCount: albums.length,
-                  //     itemBuilder: (BuildContext context, int index) {
-                  //       final album = albums[index];
-                  //       return GestureDetector(
-                  //         onTap: () {
-                  //           // Navegar para a página do reprodutor de música
-                  //           // print( 'Tocando ${album.name}, do ${album.imageUrl}');
-                  //           Navigator.push(
-                  //             context,
-                  //             MaterialPageRoute(
-                  //               builder: (context) =>
-                  //                   // MusicDetailPage(), // AudioPlayerSreen(),
-                  //                   MusicDetailPage(
-                  //                 musicID: album.id,
-                  //                 title: album.name,
-                  //                 description: "Wizkid",
-                  //                 color: Colors.black,
-                  //                 img: album.imageUrl,
-                  //                 songUrl: "assets/audio/gym.mp3",
-                  //                 // final String title;
-                  //                 // final String description;
-                  //                 // final Color color;
-                  //                 // final String img;
-                  //                 // final String songUrl;
-                  //                 // ),
-                  //               ),
-                  //             ),
-                  //           );
-                  //         },
-                  //         child: Column(
-                  //           children: [
-                  //             Padding(
-                  //               padding: const EdgeInsets.only(left: 14),
-                  //               child: Container(
-                  //                 width: 120,
-                  //                 height: 120,
-                  //                 decoration: BoxDecoration(
-                  //                   borderRadius: BorderRadius.circular(8),
-                  //                   image: DecorationImage(
-                  //                     image: AssetImage(album.imageUrl),
-                  //                     fit: BoxFit.cover,
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //             const SizedBox(height: 4),
-                  //             Padding(
-                  //               padding: const EdgeInsets.only(left: 14),
-                  //               child: SizedBox(
-                  //                 width: 120,
-                  //                 child: Center(
-                  //                   child: Text(
-                  //                     album.name,
-                  //                     style: const TextStyle(fontSize: 14),
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
-                  SizedBox(height: 6),
-                  // SizedBox(
-                  //   height: 150,
-                  //   child: ListView.builder(
-                  //     padding: EdgeInsets.zero,
-                  //     scrollDirection: Axis.horizontal,
-                  //     itemCount: albums.length,
-                  //     itemBuilder: (BuildContext context, int index) {
-                  //       final album = albums[index];
-                  //       return GestureDetector(
-                  //         onTap: () {
-                  //           // Navegar para a página do reprodutor de música
-                  //           // print( 'Tocando ${album.name}, do ${album.imageUrl}');
-                  //           Navigator.push(
-                  //             context,
-                  //             MaterialPageRoute(
-                  //               builder: (context) =>
-                  //                   // MusicDetailPage(), // AudioPlayerSreen(),
-                  //                   MusicDetailPage(
-                  //                 musicID: album.id,
-                  //                 title: album.name,
-                  //                 description: "Wizkid",
-                  //                 color: Colors.black,
-                  //                 img: album.imageUrl,
-                  //                 songUrl: "assets/audio/gym.mp3",
-                  //                 // final String title;
-                  //                 // final String description;
-                  //                 // final Color color;
-                  //                 // final String img;
-                  //                 // final String songUrl;
-                  //                 // ),
-                  //               ),
-                  //             ),
-                  //           );
-                  //         },
-                  //         child: Column(
-                  //           children: [
-                  //             Padding(
-                  //               padding: const EdgeInsets.only(left: 14),
-                  //               child: Container(
-                  //                 width: 120,
-                  //                 height: 120,
-                  //                 decoration: BoxDecoration(
-                  //                   borderRadius: BorderRadius.circular(8),
-                  //                   image: DecorationImage(
-                  //                     image: AssetImage(album.imageUrl),
-                  //                     fit: BoxFit.cover,
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //             const SizedBox(height: 4),
-                  //             Padding(
-                  //               padding: const EdgeInsets.only(left: 14),
-                  //               child: SizedBox(
-                  //                 width: 120,
-                  //                 child: Center(
-                  //                   child: Text(
-                  //                     album.name,
-                  //                     style: const TextStyle(fontSize: 14),
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
-                  SizedBox(height: 6),
-                  Padding(
+                  // SizedBox(height: 6),
+                  const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 14),
                     child: Align(
                       alignment: Alignment.centerLeft, // Alinhar à esquerda
@@ -1687,7 +1226,7 @@ class _SearchState extends State<SearchPage> {
                         padding: EdgeInsets.symmetric(vertical: 5),
                         // Adicionar padding vertical
                         child: Text(
-                          'New Albums',
+                          'Popular songs',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -1697,146 +1236,76 @@ class _SearchState extends State<SearchPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // SizedBox(
-                  //   height: 150,
-                  //   child: ListView.builder(
-                  //     padding: EdgeInsets.zero,
-                  //     scrollDirection: Axis.horizontal,
-                  //     itemCount: albums.length,
-                  //     itemBuilder: (BuildContext context, int index) {
-                  //       final album = albums[index];
-                  //       return GestureDetector(
-                  //         onTap: () {
-                  //           // Navegar para a página do reprodutor de música
-                  //           // print( 'Tocando ${album.name}, do ${album.imageUrl}');
-                  //           Navigator.push(
-                  //             context,
-                  //             MaterialPageRoute(
-                  //               builder: (context) =>
-                  //                   // MusicDetailPage(), // AudioPlayerSreen(),
-                  //                   MusicDetailPage(
-                  //                 musicID: album.id,
-                  //                 title: album.name,
-                  //                 description: "Wizkid",
-                  //                 color: Colors.black,
-                  //                 img: album.imageUrl,
-                  //                 songUrl: "assets/audio/gym.mp3",
-                  //                 // final String title;
-                  //                 // final String description;
-                  //                 // final Color color;
-                  //                 // final String img;
-                  //                 // final String songUrl;
-                  //                 // ),
-                  //               ),
-                  //             ),
-                  //           );
-                  //         },
-                  //         child: Column(
-                  //           children: [
-                  //             Padding(
-                  //               padding: const EdgeInsets.only(left: 14),
-                  //               child: Container(
-                  //                 width: 120,
-                  //                 height: 120,
-                  //                 decoration: BoxDecoration(
-                  //                   borderRadius: BorderRadius.circular(8),
-                  //                   image: DecorationImage(
-                  //                     image: AssetImage(album.imageUrl),
-                  //                     fit: BoxFit.cover,
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //             const SizedBox(height: 4),
-                  //             Padding(
-                  //               padding: const EdgeInsets.only(left: 14),
-                  //               child: SizedBox(
-                  //                 width: 120,
-                  //                 child: Center(
-                  //                   child: Text(
-                  //                     album.name,
-                  //                     style: const TextStyle(fontSize: 14),
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
-                  const SizedBox(height: 6),
-                  // SizedBox(
-                  //   height: 150,
-                  //   child: ListView.builder(
-                  //     padding: EdgeInsets.zero,
-                  //     scrollDirection: Axis.horizontal,
-                  //     itemCount: albums.length,
-                  //     itemBuilder: (BuildContext context, int index) {
-                  //       final album = albums[index];
-                  //       return GestureDetector(
-                  //         onTap: () {
-                  //           // Navegar para a página do reprodutor de música
-                  //           // print( 'Tocando ${album.name}, do ${album.imageUrl}');
-                  //           Navigator.push(
-                  //             context,
-                  //             MaterialPageRoute(
-                  //               builder: (context) =>
-                  //                   // MusicDetailPage(), // AudioPlayerSreen(),
-                  //                   MusicDetailPage(
-                  //                 musicID: album.id,
-                  //                 title: album.name,
-                  //                 description: "Wizkid",
-                  //                 color: Colors.black,
-                  //                 img: album.imageUrl,
-                  //                 songUrl: "assets/audio/gym.mp3",
-                  //                 // final String title;
-                  //                 // final String description;
-                  //                 // final Color color;
-                  //                 // final String img;
-                  //                 // final String songUrl;
-                  //                 // ),
-                  //               ),
-                  //             ),
-                  //           );
-                  //         },
-                  //         child: Column(
-                  //           children: [
-                  //             Padding(
-                  //               padding: const EdgeInsets.only(left: 14),
-                  //               child: Container(
-                  //                 width: 120,
-                  //                 height: 120,
-                  //                 decoration: BoxDecoration(
-                  //                   borderRadius: BorderRadius.circular(8),
-                  //                   image: DecorationImage(
-                  //                     image: AssetImage(album.imageUrl),
-                  //                     fit: BoxFit.cover,
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //             const SizedBox(height: 4),
-                  //             Padding(
-                  //               padding: const EdgeInsets.only(left: 14),
-                  //               child: SizedBox(
-                  //                 width: 120,
-                  //                 child: Center(
-                  //                   child: Text(
-                  //                     album.name,
-                  //                     style: const TextStyle(fontSize: 14),
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
-                  const SizedBox(height: 6),
+                  Container(
+                    // color: Color.fromARGB(255, 43, 38, 38),
+                    height: 200, // Altura fixa para o ListView.builder
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: popularesMusicas.length,
+                      itemBuilder: (context, index) {
+                        final r = popularesMusicas[index];
+                        return SizedBox(
+                            width: 110,
+                            child: GestureDetector(
+                              onTap: () {
+                                // Ação a ser executada ao pressionar o Container
+                                // print('Container pressionado!');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MusicDetailPage(
+                                      musicID: r['musicId'] ?? 'unknown id',
+                                      title: r['musicTitle'] ?? 'unknown title',
+                                      description: r['description'] ??
+                                          'unknown description',
+                                      color: Colors.black,
+                                      img: r['musicImage'] ?? 'unknown image',
+                                      songUrl: "assets/audio/gym.mp3",
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                // color: Colors.blue,
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 1.0,
+                                    horizontal: 4.0,
+                                  ),
+                                  title: Container(
+                                    // color: Colors.yellow,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        getImage(r['musicImage'] ??
+                                            'image default'), // Imagem adicionada no topo
+                                        SizedBox(height: 4),
+                                        Text(
+                                          r['musicTitle'] ?? 'title default',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(height: 2),
+                                        Text(
+                                          r['description'] ??
+                                              'description default',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ));
+                      },
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -2451,6 +1920,8 @@ class MusicDetailPage extends StatefulWidget {
 
   @override
   _MusicDetailPageState createState() => _MusicDetailPageState();
+
+  List<String> get likesID => this.likesID;
 }
 
 class _MusicDetailPageState extends State<MusicDetailPage> {
@@ -2462,6 +1933,9 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
   int seconds = 0;
   bool isPlaying = true;
   double _value = 0.0;
+  bool isLiked = false;
+
+  // List<String> get likesID => []; // Define the likesID getter
 
   @override
   void initState() {
@@ -2481,7 +1955,9 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
     initializeAudio();
 
     // se o user tiver na lista, liske para comecar senao like vazio
-    // getNumLikes()
+    getLike(widget.musicID);
+
+    // musicID);
   }
 
   @override
@@ -2490,9 +1966,17 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
     super.dispose();
   }
 
-  int getNumLikes() {
+  void getLike(String userId) {
     // return widget.likesID.length;
-    return 0;
+    // return widget.likesID.contains(userId);
+
+    AuthService().idInLikes(userId).then((value) {
+      if (mounted) {
+        setState(() {
+          isPressed = value;
+        });
+      }
+    });
   }
 
   Future<void> initializeAudio() async {
@@ -2873,70 +2357,6 @@ class _LibraryPageState extends State<LibraryPage> {
   List<String> results = [];
   bool isList = true;
 
-  // List<Album> libraryData = [
-  //   Album(
-  //     name: "StarBoy 1",
-  //     imageUrl: "assets/images/3.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 2",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 3",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 4",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 5",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 1",
-  //     imageUrl: "assets/images/3.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 2",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 3",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 4",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 5",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 1",
-  //     imageUrl: "assets/images/3.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 2",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 3",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 4",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     name: "StarBoy 5",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   // Adicione mais álbuns conforme necessário
-  // ];
-
   List<Map<String, dynamic>> musicas = [];
   AuthService authService = AuthService();
 
@@ -2944,12 +2364,12 @@ class _LibraryPageState extends State<LibraryPage> {
     List<Map<String, dynamic>> fetchedMusicas =
         await authService.getMusicasUser();
 
-    List<Map<String, dynamic>> fetchedPlaylists =
-        await authService.getPlaylistsUser();
+    // List<Map<String, dynamic>> fetchedPlaylists =
+    // await authService.getPlaylistsUser();
 
     List<Map<String, dynamic>> mergedList = [
       ...fetchedMusicas,
-      ...fetchedPlaylists
+      // ...fetchedPlaylists
     ];
 
     // adicionar filtros e ordem
@@ -3248,6 +2668,26 @@ class _LibraryPageState extends State<LibraryPage> {
                                     //     ),
                                     //   ),
                                     // );
+                                    //       onTap: () {
+                                    //   // Ação a ser executada ao pressionar o Container
+                                    //   // print('Container pressionado!');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MusicDetailPage(
+                                          musicID:
+                                              data['musicId'] ?? 'unknown id',
+                                          title:
+                                              data['title'] ?? 'unknown title',
+                                          description: data['description'] ??
+                                              'unknown description',
+                                          color: Colors.black,
+                                          img: data['imageUrl'] ??
+                                              'unknown image',
+                                          songUrl: "assets/audio/gym.mp3",
+                                        ),
+                                      ),
+                                    );
                                   },
                                   child: Container(
                                     // color: Colors.yellow,
@@ -3262,7 +2702,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                                     ? BorderRadius.circular(60)
                                                     : BorderRadius.circular(8),
                                             child: Image.asset(
-                                              data['imageUrl'],
+                                              data['imageUrl'] ?? '',
                                               fit: BoxFit.cover,
                                               height: 100,
                                               width: 100,
@@ -3346,6 +2786,23 @@ class _LibraryPageState extends State<LibraryPage> {
                                       //     ),
                                       //   ),
                                       // );
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MusicDetailPage(
+                                            musicID:
+                                                data['musicId'] ?? 'unknown id',
+                                            title: data['title'] ??
+                                                'unknown title',
+                                            description: data['description'] ??
+                                                'unknown description',
+                                            color: Colors.black,
+                                            img: data['imageUrl'] ??
+                                                'unknown image',
+                                            songUrl: "assets/audio/gym.mp3",
+                                          ),
+                                        ),
+                                      );
                                     },
                                     child: Container(
                                       // color: Colors.red,
@@ -4523,532 +3980,6 @@ class ProfilePage extends StatefulWidget {
   _ProfilePageState createState() => _ProfilePageState();
 }
 
-// class _ProfilePageState extends State<ProfilePage> {
-//   String? getFirstName() {
-//     String? fullName = AuthService().getUserName();
-//   }
-//   List<Album> libraryData = [
-//     Album(
-//       name: "StarBoy 1",
-//       imageUrl: "assets/images/3.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 2",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 3",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 4",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 5",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 1",
-//       imageUrl: "assets/images/3.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 2",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 3",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 4",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 5",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 1",
-//       imageUrl: "assets/images/3.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 2",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 3",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 4",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     Album(
-//       name: "StarBoy 5",
-//       imageUrl: "assets/images/background.jpg",
-//     ),
-//     // Adicione mais álbuns conforme necessário
-//   ];
-//   bool isList = true;
-//   final List<Map<String, String>> data = [
-//     {
-//       'image': 'https://picsum.photos/100',
-//       'title': 'Título 1',
-//       'subtitle': 'Subtítulo 1'
-//     },
-//     {
-//       'image': 'https://picsum.photos/100',
-//       'title': 'Título 2',
-//       'subtitle': 'Subtítulo 2'
-//     },
-//     {
-//       'image': 'https://picsum.photos/100',
-//       'title': 'Título 3',
-//       'subtitle': 'Subtítulo 3'
-//     },
-//     {
-//       'image': 'https://picsum.photos/100',
-//       'title': 'Título 4',
-//       'subtitle': 'Subtítulo 4'
-//     },
-//   ];
-//   @override
-//   Widget build(BuildContext context) {
-//     final marginHeight = MediaQuery.of(context).size.height * 0.3;
-//     return Scaffold(
-//       body: Container(
-//         // color: Colors.black.withOpacity(0.5),
-//         child: Stack(
-//           children: [
-//             Container(
-//               decoration: const BoxDecoration(
-//                 image: DecorationImage(
-//                   image: AssetImage('assets/images/background.jpg'),
-//                   fit: BoxFit.cover,
-//                 ),
-//               ),
-//             ),
-//             Container(
-//               margin: EdgeInsets.only(top: marginHeight),
-//               color: Colors.white.withOpacity(0.7),
-//               // padding:
-//               //     const EdgeInsets.only(left: 5, top: 0, bottom: 0, right: 5),
-//               child: Column(
-//                 // mainAxisAlignment: MainAxisAlignment.center,
-//                 // crossAxisAlignment: CrossAxisAlignment.center,
-//                 // color: Colors.amber,
-//                 children: [
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Container(
-//                         // color: Colors.amber.withOpacity(0.9),
-//                         width: 70,
-//                         padding: const EdgeInsets.only(
-//                             left: 0, top: 5, bottom: 0, right: 0),
-//                         child: Column(
-//                           crossAxisAlignment: CrossAxisAlignment.center,
-//                           children: [
-//                             CircleAvatar(
-//                               // profile image from google acount
-//                               // backgroundImage: AssetImage(
-//                               //   getProfileImage(),
-//                               // ),
-//                               // backgroundImage:
-//                               //     Image.network(
-//                               //       // Provider.of(context).auth.getProfileImage()),
-//                               //       AuthService().getProfileImage()),
-//                               backgroundImage: NetworkImage(
-//                                   AuthService().getProfileImage() ?? ''),
-//                               radius: 30,
-//                             ),
-//                             const SizedBox(height: 5),
-//                             Text(
-//                               AuthService().getUserName() ?? '',
-//                               // getFirstName(),
-//                               style: const TextStyle(
-//                                 fontSize: 12,
-//                                 // fontWeight: FontWeight.bold,
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                       Container(
-//                         // color: Colors.blue.withOpacity(0.9),
-//                         // width: 90,
-//                         padding: const EdgeInsets.only(
-//                             left: 10, top: 5, bottom: 0, right: 10),
-//                         child: Column(
-//                           crossAxisAlignment: CrossAxisAlignment.start,
-//                           children: [
-//                             Row(
-//                               mainAxisAlignment: MainAxisAlignment.center,
-//                               children: [
-//                                 Column(
-//                                   children: [
-//                                     Text(
-//                                       '2.9M',
-//                                       style: TextStyle(
-//                                         fontSize: 16,
-//                                         // fontWeight: FontWeight.bold,
-//                                       ),
-//                                     ),
-//                                     const SizedBox(height: 1),
-//                                     Text(
-//                                       'followers',
-//                                       style: TextStyle(
-//                                         fontSize: 12,
-//                                         // fontWeight: FontWeight.bold,
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                                 const SizedBox(width: 5),
-//                                 Column(
-//                                   children: [
-//                                     Text(
-//                                       '5.9',
-//                                       style: TextStyle(
-//                                         fontSize: 16,
-//                                       ),
-//                                     ),
-//                                     const SizedBox(height: 1),
-//                                     Text(
-//                                       'rating',
-//                                       style: TextStyle(
-//                                         fontSize: 12,
-//                                         // fontWeight: FontWeight.bold,
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                                 const SizedBox(width: 30),
-//                                 Column(
-//                                   children: [
-//                                     ElevatedButton(
-//                                       onPressed: () {
-//                                         // Adicione aqui a lógica para abrir a tela de edição de perfil
-//                                       },
-//                                       style: ElevatedButton.styleFrom(
-//                                         primary: Colors
-//                                             .transparent, // Não é mais necessário, utilize o backgroundColor
-//                                         onPrimary: Colors
-//                                             .black, // Define a cor do texto
-//                                         side: const BorderSide(
-//                                             color: Colors.black,
-//                                             width:
-//                                                 1.0), // Adiciona uma borda preta
-//                                         elevation: 0, // Remove a sombra
-//                                       ),
-//                                       child: const Text(
-//                                         'Editar Perfil',
-//                                         style: TextStyle(
-//                                           fontSize:
-//                                               13, // Diminui o tamanho do texto
-//                                         ),
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                               ],
-//                             ),
-//                             const SizedBox(height: 1),
-//                             const Row(
-//                               // descricao
-//                               mainAxisAlignment: MainAxisAlignment.start,
-//                               children: [
-//                                 Text(
-//                                   'Lorem ipsum dolor sit ametdsdadasd sss.',
-//                                   style: TextStyle(
-//                                     fontSize: 12,
-//                                     // fontWeight: FontWeight.bold,
-//                                   ),
-//                                   softWrap: true,
-//                                   maxLines:
-//                                       2, // Define o número máximo de linhas
-//                                   overflow: TextOverflow
-//                                       .ellipsis, // Adiciona "..." quando o texto é muito longo
-//                                   textAlign: TextAlign
-//                                       .center, // Centraliza o texto horizontalmente
-//                                 ),
-//                               ],
-//                             )
-//                           ],
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   // const SizedBox(height: 5),
-//                   // Visibility(
-//                   //   visible:
-//                   //       true, // Define a visibilidade com base no valor de isList
-//                   //   child: SingleChildScrollView(
-//                   //     child: Container(
-//                   //       color: Colors.blue,
-//                   //       // height: MediaQuery.of(context).size.height * 0.4,
-//                   //       child: GridView.builder(
-//                   //         shrinkWrap: true,
-//                   //         padding: const EdgeInsets.only(
-//                   //             left: 14, right: 10, top: 10, bottom: 10),
-//                   //         gridDelegate:
-//                   //             const SliverGridDelegateWithFixedCrossAxisCount(
-//                   //           crossAxisCount: 3, // Número de colunas desejado
-//                   //           crossAxisSpacing: 5, // Espaçamento entre as colunas
-//                   //           mainAxisSpacing: 5, // Espaçamento entre as linhas
-//                   //           mainAxisExtent: 150, // Altura das linhas
-//                   //         ),
-//                   //         itemCount: libraryData.length,
-//                   //         itemBuilder: (BuildContext context, int index) {
-//                   //           final data = libraryData[index];
-//                   //           return GestureDetector(
-//                   //             onTap: () {
-//                   //               Navigator.push(
-//                   //                 context,
-//                   //                 MaterialPageRoute(
-//                   //                   builder: (context) => MusicDetailPage(
-//                   //                     title: data.name,
-//                   //                     description: "Wizkid",
-//                   //                     color: Colors.black,
-//                   //                     img: data.imageUrl,
-//                   //                     songUrl: "assets/audio/gym.mp3",
-//                   //                   ),
-//                   //                 ),
-//                   //               );
-//                   //             },
-//                   //             child: Container(
-//                   //               child: Column(
-//                   //                 children: [
-//                   //                   ClipRect(
-//                   //                     child: ClipRRect(
-//                   //                       borderRadius: BorderRadius.circular(8),
-//                   //                       child: Image.asset(
-//                   //                         data.imageUrl,
-//                   //                         fit: BoxFit.cover,
-//                   //                         height: 100,
-//                   //                         width: 100,
-//                   //                       ),
-//                   //                     ),
-//                   //                   ),
-//                   //                   const Padding(
-//                   //                     padding: EdgeInsets.only(
-//                   //                         left: 0.0,
-//                   //                         top: 2.0,
-//                   //                         bottom: 1.0,
-//                   //                         right: 1.0),
-//                   //                     child: Text(
-//                   //                       'Título da Legenda',
-//                   //                       style: TextStyle(
-//                   //                         fontSize: 13,
-//                   //                         fontWeight: FontWeight.bold,
-//                   //                         // letterSpacing: -0.4,
-//                   //                       ),
-//                   //                       overflow: TextOverflow.ellipsis,
-//                   //                       maxLines: 1,
-//                   //                       softWrap: false,
-//                   //                     ),
-//                   //                   ),
-//                   //                   const Padding(
-//                   //                     padding: EdgeInsets.only(
-//                   //                         left: 0.0,
-//                   //                         top: 2.0,
-//                   //                         bottom: 1.0,
-//                   //                         right: 1.0),
-//                   //                     child: Text(
-//                   //                       'Subtítulo da Legenda',
-//                   //                       style: TextStyle(
-//                   //                         fontSize: 11,
-//                   //                         fontWeight: FontWeight.bold,
-//                   //                         color: Colors.grey,
-//                   //                         // letterSpacing: -0.4,
-//                   //                       ),
-//                   //                       overflow: TextOverflow.ellipsis,
-//                   //                       maxLines: 2,
-//                   //                       softWrap: false,
-//                   //                     ),
-//                   //                   ),
-//                   //                 ],
-//                   //               ),
-//                   //             ),
-//                   //           );
-//                   //         },
-//                   //       ),
-//                   //     ),
-//                   //   ),
-//                   // ),
-//                   // const SizedBox(height: 5),
-//                   Visibility(
-//                     visible: true,
-//                     child: Expanded(
-//                       child: Container(
-//                         // color: Colors.blue,
-//                         child: ListView(
-//                           padding: const EdgeInsets.only(
-//                             left: 5,
-//                             right: 5,
-//                             top: 0,
-//                             bottom: 0,
-//                           ),
-//                           children: [
-//                             SingleChildScrollView(
-//                               child: GridView.builder(
-//                                 shrinkWrap: true,
-//                                 gridDelegate:
-//                                     const SliverGridDelegateWithFixedCrossAxisCount(
-//                                   crossAxisCount: 3,
-//                                   crossAxisSpacing: 5,
-//                                   mainAxisSpacing: 5,
-//                                   mainAxisExtent: 150,
-//                                 ),
-//                                 itemCount: libraryData.length,
-//                                 itemBuilder: (BuildContext context, int index) {
-//                                   final data = libraryData[index];
-//                                   return GestureDetector(
-//                                     onTap: () {
-//                                       Navigator.push(
-//                                         context,
-//                                         MaterialPageRoute(
-//                                           builder: (context) => MusicDetailPage(
-//                                             title: data.name,
-//                                             description: "Wizkid",
-//                                             color: Colors.black,
-//                                             img: data.imageUrl,
-//                                             songUrl: "assets/audio/gym.mp3",
-//                                           ),
-//                                         ),
-//                                       );
-//                                     },
-//                                     child: Container(
-//                                       child: Column(
-//                                         children: [
-//                                           ClipRect(
-//                                             child: ClipRRect(
-//                                               borderRadius:
-//                                                   BorderRadius.circular(8),
-//                                               child: Image.asset(
-//                                                 data.imageUrl,
-//                                                 fit: BoxFit.cover,
-//                                                 height: 100,
-//                                                 width: 100,
-//                                               ),
-//                                             ),
-//                                           ),
-//                                           const Padding(
-//                                             padding: EdgeInsets.only(
-//                                               left: 0.0,
-//                                               top: 2.0,
-//                                               bottom: 1.0,
-//                                               right: 1.0,
-//                                             ),
-//                                             child: Text(
-//                                               'Título da Legenda',
-//                                               style: TextStyle(
-//                                                 fontSize: 13,
-//                                                 fontWeight: FontWeight.bold,
-//                                               ),
-//                                               overflow: TextOverflow.ellipsis,
-//                                               maxLines: 1,
-//                                               softWrap: false,
-//                                             ),
-//                                           ),
-//                                           const Padding(
-//                                             padding: EdgeInsets.only(
-//                                               left: 0.0,
-//                                               top: 2.0,
-//                                               bottom: 1.0,
-//                                               right: 1.0,
-//                                             ),
-//                                             child: Text(
-//                                               'Subtítulo da Legenda',
-//                                               style: TextStyle(
-//                                                 fontSize: 11,
-//                                                 fontWeight: FontWeight.bold,
-//                                                 color: Colors.grey,
-//                                               ),
-//                                               overflow: TextOverflow.ellipsis,
-//                                               maxLines: 2,
-//                                               softWrap: false,
-//                                             ),
-//                                           ),
-//                                         ],
-//                                       ),
-//                                     ),
-//                                   );
-//                                 },
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             // Container(),
-//           ],
-//         ),
-//       ),
-//       bottomNavigationBar: Container(
-//         color: const Color.fromARGB(75, 70, 70, 70),
-//         child: Padding(
-//           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-//           child: GNav(
-//             // backgroundColor: Color.fromARGB(0, 136, 136, 136),
-//             // rippleColor: Color.fromARGB(255, 226, 0, 0),
-//             // hoverColor: Color.fromARGB(255, 0, 255, 13),
-//             color: Colors.black,
-//             activeColor: Color.fromARGB(255, 214, 214, 214),
-//             // tabActiveBorder:
-//             //     Border.all(color: Color.fromARGB(255, 255, 255, 255), width: 1),
-//             tabBackgroundColor: Colors.black,
-//             // padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-//             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-//             // selectedIndex: _selectedIndex, 0
-//             gap: 6,
-//             iconSize: 24,
-//             // selectedIndex: 0,
-//             selectedIndex: 3,
-//             onTabChange: (index) {
-//               // print(index);
-//               if (index == 0) {
-//                 Navigator.pushReplacementNamed(context, '/home');
-//               } else if (index == 1) {
-//                 Navigator.pushReplacementNamed(context, '/search');
-//               } else if (index == 2) {
-//                 Navigator.pushReplacementNamed(context, '/library');
-//               } else if (index == 3) {
-//                 Navigator.pushReplacementNamed(context, '/profile');
-//               }
-//             },
-//             tabs: [
-//               GButton(
-//                 icon: Icons.home,
-//                 text: 'Home',
-//                 // height: 100.0,
-//               ),
-//               GButton(
-//                 icon: Icons.search,
-//                 text: 'Search',
-//               ),
-//               GButton(
-//                 icon: Icons.library_books,
-//                 text: 'Library',
-//               ),
-//               GButton(
-//                 icon: Icons.person,
-//                 text: 'Profile',
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class _ProfilePageState extends State<ProfilePage> {
   // int counter = 0;
   List<Map<String, dynamic>> myPlaylist = [];
@@ -5058,13 +3989,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String bio = '';
   FocusNode bioFocusNode = FocusNode();
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   getmyplaylist();
-  //   // AuthService().getUserProfile();
-  //   getProfileInfo();
-  // }
+  @override
   void initState() {
     super.initState();
     myPlaylist = [];
@@ -5138,15 +4063,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // void saveChanges() {
   //   String newBio = bioController.text;
-
   //   // Implemente a lógica para salvar as alterações no perfil
-
   //   setState(() {
   //     isEditing = false;
   //     bio = newBio;
   //   });
   // }
-
   // @override
   // Widget build(BuildContext context) {
   //   return Scaffold(
@@ -5172,7 +4094,6 @@ class _ProfilePageState extends State<ProfilePage> {
     int followers = userProfile['followers'] ?? 0;
     double rating = userProfile['rating'] ?? 0.0;
 
-    // bio = userProfile['bio'] ?? '';
     bioController.text = bio;
 
     bioController.selection = TextSelection.fromPosition(
@@ -5438,6 +4359,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   final data = myPlaylist[index];
                                   return GestureDetector(
                                     onTap: () {
+                                      // myPlaylist
                                       // Navigator.push(
                                       //   context,
                                       //   MaterialPageRoute(
@@ -5451,6 +4373,24 @@ class _ProfilePageState extends State<ProfilePage> {
                                       //     ),
                                       //   ),
                                       // );
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MusicDetailPage(
+                                            musicID:
+                                                data['musicId'] ?? 'unknown id',
+                                            title: data['title'] ??
+                                                'unknown title',
+                                            description: data['description'] ??
+                                                'unknown description',
+                                            color: Colors.black,
+                                            img: data['imageUrl'] ??
+                                                'unknown image',
+                                            songUrl: "assets/audio/gym.mp3",
+                                          ),
+                                        ),
+                                      );
                                     },
                                     child: Container(
                                       child: Column(

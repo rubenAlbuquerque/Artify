@@ -139,8 +139,10 @@ class AuthService {
     // String userId = userCredential.user!.uid;
     CollectionReference users = FirebaseFirestore.instance.collection('users');
 
-    QuerySnapshot querySnapshot =
-        await users.where('verify', isEqualTo: true).get();
+    QuerySnapshot querySnapshot = await users
+        .where('userId', isEqualTo: userCredential.user!.uid)
+        .where('verify', isEqualTo: true)
+        .get();
 
     if (querySnapshot.size == 0) {
       // se nao hover nenhum user com verify = true,
@@ -149,7 +151,8 @@ class AuthService {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid)
-          .set({
+          .set({ 
+        'userId': userCredential.user!.uid,
         'name': userCredential.user!.displayName,
         'email': userCredential.user!.email,
         'image': "https://example.com/profile.jpg",
@@ -321,6 +324,9 @@ class AuthService {
         .get();
 
     for (DocumentSnapshot doc in querySnapshot.docs) {
+      // get the id - doc.id
+
+      // String id = doc.id;
       Map<String, dynamic> playlistData = doc.data() as Map<String, dynamic>;
       List<DocumentReference> songs = List<DocumentReference>.from(playlistData[
           'songs']); // Obtém o array de referências 'songs' da playlist
@@ -330,8 +336,15 @@ class AuthService {
         DocumentSnapshot songSnapshot = await songRef.get();
 
         if (songSnapshot.exists) {
+          // get the id
+          String id = songSnapshot.id;
           Map<String, dynamic> musica =
               songSnapshot.data() as Map<String, dynamic>;
+          // musicas.add({
+          //   'id': id,
+          //   'musica': musica,
+          // });
+          musica['musicId'] = id; // Adiciona o ID no mapa 'musica'
           musicas.add(musica);
         }
       }
@@ -429,8 +442,13 @@ class AuthService {
 
     List<Map<String, dynamic>> playlist = [];
     querySnapshot.docs.forEach((doc) {
+      String id = doc.id;
+
+      String userId = doc['userId'];
       Map<String, dynamic> playlistData = doc.data() as Map<String, dynamic>;
 
+      playlistData['musicId'] = id;
+      playlistData['userId'] = userId;
       playlist.add(playlistData);
     });
     // ver a lista
@@ -863,6 +881,26 @@ class AuthService {
     }
 
     return allResults;
+  }
+
+  // obter informacoes da musica a partir do id
+  Future<bool> idInLikes(String musicId) async {
+    final musicService = FirestoreService('music');
+
+    final DocumentSnapshot musicDoc =
+        await musicService._collection.doc(musicId).get();
+
+    if (!musicDoc.exists) {
+      return false; // The music document doesn't exist
+    }
+
+    final List<dynamic> likes =
+        (musicDoc.data()! as Map<String, dynamic>)['likes'] as List<dynamic>? ??
+            [];
+
+    final String targetId = auth.currentUser!.uid; // ID you want to check
+
+    return likes.contains(targetId);
   }
 }
 
