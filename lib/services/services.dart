@@ -7,7 +7,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 // import 'package::file_picker/file_picker.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+// core firebase
 class FirestoreService {
   final CollectionReference _collection;
 
@@ -86,6 +90,19 @@ class FirestoreService {
   }
 }
 
+class Notification {
+  void send() {
+    // TODO: Implement this method.
+  }
+}
+
+class EmailNotification extends Notification {
+  @override
+  void send() {
+    print("Sending email notification...");
+  }
+}
+
 class AuthService {
   FirebaseAuth auth = FirebaseAuth.instance;
   final GoogleSignIn? googlesignIn = GoogleSignIn();
@@ -151,7 +168,7 @@ class AuthService {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid)
-          .set({ 
+          .set({
         'userId': userCredential.user!.uid,
         'name': userCredential.user!.displayName,
         'email': userCredential.user!.email,
@@ -179,8 +196,6 @@ class AuthService {
       return 'Utilizador NULL';
     }
   }
-
-  //
 
   // obter email do usuário
   String? getUserEmail() {
@@ -470,13 +485,14 @@ class AuthService {
             userSnapshot.data() as Map<String, dynamic>;
 
         String bio = userData['bio'] ?? '';
-        List<dynamic> followers = userData['followers'] ?? [];
-        int followersCount = followers.length;
+        // List<dynamic> followers = userData['followers'] ?? [];
+        // int followersCount = followers.length;
+        List<String> followers = List<String>.from(userData['followers'] ?? []);
         double rating = (userData['rating'] ?? 0).toDouble();
 
         return {
           'bio': bio,
-          'followers': followersCount,
+          'followers': followers,
           'rating': rating,
         };
       } else {
@@ -517,30 +533,23 @@ class AuthService {
   //     return null;
   //   }
   // }
-
   // Future<void> searchterm(String term) async {
-
   //   final musicService = FirestoreService('music');
   //   final playlist = FirestoreService('playlists');
   //   final users = FirestoreService('users');
-
   //   // procurar em todas as colecoes o ducumento com comece pelo term
   //   final QuerySnapshot querySnapshot = await musicService._collection
   //       .where('title', isGreaterThanOrEqualTo: term)
   //       .get();
-
   //   final QuerySnapshot querySnapshot2 = await playlist._collection
   //       .where('title', isGreaterThanOrEqualTo: term)
   //       .get();
-
   //   final QuerySnapshot querySnapshot3 = await users._collection
   //       .where('name', isGreaterThanOrEqualTo: term)
   //       .get();
-
   //   final List<DocumentSnapshot> musicResults = querySnapshot.docs
   //       .where((doc) => doc['title'].startsWith(term))
   //       .toList();
-
   //   final List<DocumentSnapshot> playlistResults = querySnapshot2.docs
   //       .where((doc) => doc['title'].startsWith(term))
   //       .toList();
@@ -548,26 +557,23 @@ class AuthService {
   //   final List<DocumentSnapshot> usersResults = querySnapshot3.docs
   //       .where((doc) => doc['name'].startsWith(term))
   //       .toList();
-
   //   // Combine os resultados de todas as coleções
   //   final allResults = [...musicResults, ...playlistResults, ...usersResults];
-
   //  return allResults;
-
   // }
 
   Future<List<Map<String, String>>> searchterm(String term) async {
     final musicService = FirestoreService('music');
-    final playlist = FirestoreService('playlists');
+    // final playlist = FirestoreService('playlists');
     final users = FirestoreService('users');
 
     final QuerySnapshot querySnapshot = await musicService._collection
         .where('title', isGreaterThanOrEqualTo: term)
         .get();
 
-    final QuerySnapshot querySnapshot2 = await playlist._collection
-        .where('title', isGreaterThanOrEqualTo: term)
-        .get();
+    // final QuerySnapshot querySnapshot2 = await playlist._collection
+    //     .where('title', isGreaterThanOrEqualTo: term)
+    //     .get();
 
     final QuerySnapshot querySnapshot3 = await users._collection
         .where('name', isGreaterThanOrEqualTo: term)
@@ -577,9 +583,9 @@ class AuthService {
         .where((doc) => doc['title'].startsWith(term))
         .toList();
 
-    final List<DocumentSnapshot> playlistResults = querySnapshot2.docs
-        .where((doc) => doc['title'].startsWith(term))
-        .toList();
+    // final List<DocumentSnapshot> playlistResults = querySnapshot2.docs
+    //     .where((doc) => doc['title'].startsWith(term))
+    //     .toList();
 
     final List<DocumentSnapshot> usersResults = querySnapshot3.docs
         .where((doc) => doc['name'].startsWith(term))
@@ -593,16 +599,18 @@ class AuthService {
 
     final List<Map<String, String>> allResults = [
       ...musicResults.map((doc) => {
+            'id': doc.id,
             'title': doc['title'] as String,
             'type': 'music',
             'image': doc['imageUrl'] as String,
           }),
-      ...playlistResults.map((doc) => {
-            'title': doc['title'] as String,
-            'type': 'playlist',
-            'image': doc['imageUrl'] as String,
-          }),
+      // ...playlistResults.map((doc) => {
+      //       'title': doc['title'] as String,
+      //       'type': 'playlist',
+      //       'image': doc['imageUrl'] as String,
+      //     }),
       ...usersResults.map((doc) => {
+            'id': doc.id,
             'title': doc['name'] as String,
             'type': 'Artist',
             'image': doc['image'] as String,
@@ -901,6 +909,143 @@ class AuthService {
     final String targetId = auth.currentUser!.uid; // ID you want to check
 
     return likes.contains(targetId);
+  }
+
+  Widget renderImg(String imageUrl, double width, double height) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10), // Set the border radius you want
+      child: Container(
+        width: width,
+        height: height,
+        child: Image.network(
+          imageUrl,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              return child;
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Center(
+              child: Icon(
+                Icons.error,
+                size: 40,
+                color: Colors.red,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  // / / / / / / / / / / / / / / 7 7 /7
+
+  // / / / / / / / / / / / / / / 7 7 /
+  // void sendNotification(String userId) {
+  //   // Obter o FCM Token do usuário (Supondo que você tenha o FCM Token do usuário armazenado em algum lugar)
+  //   // String userFCMToken = getUserFCMToken(userId);
+  //   // Verifique se você possui o FCM Token do usuário antes de prosseguir
+  //   if (userFCMToken != null && userFCMToken.isNotEmpty) {
+  //     // Configurar a mensagem de notificação
+  //     final message = {
+  //       'notification': {
+  //         'title': 'Título da Notificação',
+  //         'body': 'Corpo da Notificação',
+  //       },
+  //       'token': userFCMToken, // FCM Token do usuário destinatário
+  //     };
+  //     // Enviar a notificação para o FCM usando o FirebaseMessaging
+  //     //   FirebaseMessaging.instance.send(message).then((value) {
+  //     //     print('Notificação enviada com sucesso!');
+  //     //   }).catchError((error) {
+  //     //     print('Erro ao enviar a notificação: $error');
+  //     //   });
+  //     // } else {
+  //     //   print('FCM Token do usuário não encontrado ou inválido.');
+  //   }
+  // }
+
+  // Função de exemplo para obter o FCM Token do usuário a partir do ID do usuário (supondo que você tenha isso armazenado)
+  // Future<String> getUserFCMToken(String userId) async {
+  // Lógica para obter o FCM Token do usuário usando o ID do usuário (pode ser uma chamada de API, consulta ao banco de dados, etc.)
+  // Retorne o FCM Token encontrado ou null se não estiver disponível.
+  // Exemplo:
+  // return myApiService.getUserFCMToken(userId);
+  //   final fcmToken = await FirebaseMessaging.instance.getToken();
+  //   return fcmToken; //'EXEMPLO_FCM_TOKEN_DO_USUARIO';
+  // }
+
+  // void sendNotification(String userId) {
+  //   // Obter o FCM Token do usuário (Supondo que você tenha o FCM Token do usuário armazenado em algum lugar)
+  //   // String userFCMToken = getUserFCMToken(userId);
+
+  //   // Obtenha o token FCM do usuário.
+  //   FirebaseMessaging.instance.getToken().then((token) {
+  //     // Crie um objeto `Notification`.
+  //     // Notification notification = Notification(
+  //     //   label: 'Você tem um novo seguidor!',
+  //     //   body: 'Olá, você tem um novo seguidor!',
+  //     // );
+
+  //     // Envie a notificação.
+  //     FirebaseMessaging.instance.send(notification);
+  //   });
+  // }
+
+  // removeCurrentUserIdFromFollowersList
+  Future<void> removeCurrentUserIdFromFollowersList(String userId) async {
+    String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+    // Get the DocumentSnapshot for the user
+    DocumentSnapshot userSnapshot =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+
+    // Retrieve the existing followers list from userData, or create an empty list if it doesn't exist
+    List<dynamic> followers = List<dynamic>.from(userData['followers'] ?? []);
+
+    // Check if the currentUserId is already in the followers list
+    if (followers.contains(currentUserId)) {
+      // Remove the currentUserId from the followers list
+      followers.remove(currentUserId);
+
+      // Update the 'followers' field in the Firestore document
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'followers': followers});
+    }
+  }
+
+  void addCurrentUserIdToFollowersList(String userId) async {
+    String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+    // Get the DocumentSnapshot for the user
+    DocumentSnapshot userSnapshot =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+
+    // Retrieve the existing followers list from userData, or create an empty list if it doesn't exist
+    List<dynamic> followers = List<dynamic>.from(userData['followers'] ?? []);
+
+    // Check if the currentUserId is already in the followers list
+    if (!followers.contains(currentUserId)) {
+      // Add the currentUserId to the followers list
+      followers.add(currentUserId);
+
+      // Update the 'followers' field in the Firestore document
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'followers': followers});
+    }
   }
 }
 

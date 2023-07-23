@@ -774,36 +774,8 @@ class _SearchState extends State<SearchPage> {
   // late Future<List<Map<String, String>>> popularesMusicas;
 
   // firebase
-  // List<Album> albums = [
-  //   Album(
-  //     id: "kkkkkkkkkkkkkkkkkkkk1",
-  //     name: "StarBoy 1",
-  //     imageUrl: "assets/images/3.jpg",
-  //   ),
-  //   Album(
-  //     id: "kkkkkkkkkkkkkkkkkkkk2",
-  //     name: "StarBoy 2",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   Album(
-  //     id: "kkkkkkkkkkkkkkkkkkkk2",
-  //     name: "StarBoy 3",
-  //     imageUrl: "assets/images/background.jpg",
-  //   ),
-  //   // Adicione mais álbuns conforme necessário
-  // ];
 
   void search(String searchText) {
-    // String searchTerm = _searchController.text;
-    // print searchTerm
-    // print(searchTerm);
-    // Faça aqui a lógica de pesquisa com base no searchTerm e atualize a lista de resultados
-    // Neste exemplo, vamos apenas filtrar uma lista de itens
-    // List<String> filteredList = albums
-    //     .where((album) =>
-    //         album.name.toLowerCase().contains(searchTerm.toLowerCase()))
-    //     .toList();
-
     AuthService().searchterm(searchText).then((results) {
       if (mounted) {
         setState(() {
@@ -819,17 +791,6 @@ class _SearchState extends State<SearchPage> {
       });
     }
   }
-
-  // void inicio() async {
-  //   if (mounted) {
-  //     setState(() {
-  //       recumendations = AuthService().recumendacoes();
-  //       // populares()
-  //       popularesMusicas = AuthService().populares();
-  //     });
-  //   }
-  //   ;
-  // }
 
   void inicio() {
     AuthService().recumendacoes().then((recommendations) {
@@ -1647,29 +1608,8 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
   Widget getImage(String imageUrl) {
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
       print("Image URL: ruben");
-      try {
-        print('left------------------');
-        return Container(
-          width: 70, // Defina a largura desejada
-          height: 130, // Defina a altura desejada
-          child: Image.network(
-            imageUrl,
-            fit: BoxFit
-                .cover, // Ajuste o modo de ajuste da imagem (cover, contain, etc.)
-          ),
-        );
-      } catch (e) {
-        print('Error loading image: $e');
-        return Container(
-          width: 50,
-          height: 50,
-          color: Colors.grey,
-          child: const Icon(
-            Icons.image_not_supported,
-            color: Colors.white,
-          ),
-        );
-      }
+
+      return AuthService().renderImg(imageUrl, 70, 130);
     } else {
       try {
         print('Right------------------');
@@ -1861,30 +1801,70 @@ class _MySearchDelegateState extends State<MySearchDelegate> {
                         itemCount: _searchResults.length,
                         itemBuilder: (context, index) {
                           final r = _searchResults[index];
-                          return ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 3.0, horizontal: 16.0),
-                            leading: getImage(
-                              r['image'] ?? 'image default',
-                            ),
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  r['title'] ?? 'title default',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                          return GestureDetector(
+                            onTap: () {
+                              // Add your desired action when the ListTile is pressed here
+                              // For example, you can navigate to a new page or show a dialog.
+                              // You can access the data in the r map to customize the behavior.
+                              // Example of navigating to a new page:
+                              print(r['id']);
+                              print("---------------------------");
+                              print("---------------------------");
+                              print("---------------------------");
+                              print("---------------------------");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) {
+                                  if (r['type'] == 'Artist') {
+                                    return ArtistPage(
+                                        userId: r['id'] ?? 'title default');
+                                  } else if (r['type'] == 'music') {
+                                    return MusicDetailPage(
+                                      musicID: r['id'] ?? 'unknown id',
+                                      title: r['title'] ?? 'unknown title',
+                                      description: r['description'] ??
+                                          'unknown description',
+                                      color: Colors.black,
+                                      img: r['image'] ?? 'unknown image',
+                                      songUrl:
+                                          'assets/audio/gym.mp3', // Replace with the correct songUrl
+                                    );
+                                  } else {
+                                    // If the type is neither 'Artist' nor 'music', you can handle it accordingly
+                                    // For example, you can show an error page or handle the case however you prefer.
+                                    return Container(
+                                      child: Center(
+                                        child:
+                                            Text('Unknown type: ${r['type']}'),
+                                      ),
+                                    );
+                                  }
+                                }),
+                              );
+                            },
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 3.0, horizontal: 16.0),
+                              leading: getImage(r['image'] ?? 'image default'),
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    r['title'] ?? 'title default',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  r['type'] ?? 'type default',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
+                                  Text(
+                                    r['type'] ?? 'type default',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           );
                         },
@@ -2100,10 +2080,10 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                               horizontal: 5, vertical: 8),
                           child: Column(
                             // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               SizedBox(
-                                width: 150,
+                                width: 220,
                                 child: Text(
                                   // "StarBoy",
                                   widget.title,
@@ -2115,7 +2095,7 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                                 ),
                               ),
                               SizedBox(
-                                width: 150,
+                                width: 220,
                                 child: Text(
                                   // "Wizkid",
                                   widget.description,
@@ -2196,18 +2176,22 @@ class _MusicDetailPageState extends State<MusicDetailPage> {
                         overlayShape: const RoundSliderOverlayShape(
                           overlayRadius: 1, // Tamanho da sobreposição
                         ),
-                        activeTrackColor: Colors.blue, // Cor da barra ativa
+                        // 255, 103, 0
+                        // 0, 78, 152
+                        // 58, 110, 165
+                        activeTrackColor: Color.fromRGBO(
+                            58, 110, 165, 1), // Tamanho da sobreposição
                         inactiveTrackColor: Colors.grey, // Cor da barra inativa
-                        thumbColor:
-                            Colors.red, // Cor do círculo do controle deslizante
+                        thumbColor: Color.fromRGBO(255, 103, 0,
+                            1), // Cor do círculo do controle deslizante
                         overlayColor: Colors.green.withOpacity(
                             0.4), // Cor da sobreposição ao arrastar o controle deslizante
                         activeTickMarkColor:
                             Colors.black, // Cor das marcas de escala ativas
                         inactiveTickMarkColor:
                             Colors.grey, // Cor das marcas de escala inativas
-                        valueIndicatorColor:
-                            Colors.yellow, // Cor do indicador de valor
+                        valueIndicatorColor: Color.fromARGB(255, 215, 215, 215),
+                        // Cor do indicador de valor
                         showValueIndicator: ShowValueIndicator
                             .always, // Exibir indicador de valor
                         valueIndicatorShape:
@@ -2648,29 +2632,13 @@ class _LibraryPageState extends State<LibraryPage> {
                                     5, // Espaçamento entre as colunas
                                 mainAxisSpacing:
                                     5, // Espaçamento entre as linhas
-                                mainAxisExtent: 140, // Altura das linhas
+                                mainAxisExtent: 150, // Altura das linhas
                               ),
                               itemCount: musicas.length,
                               itemBuilder: (BuildContext context, int index) {
                                 final data = musicas[index];
                                 return GestureDetector(
                                   onTap: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) => MusicDetailPage(
-                                    //       musicID: data['id'],
-                                    //       title: data['title'],
-                                    //       description: data['description'],
-                                    //       color: Colors.black,
-                                    //       img: data['imageUrl'],
-                                    //       songUrl: "assets/audio/gym.mp3",
-                                    //     ),
-                                    //   ),
-                                    // );
-                                    //       onTap: () {
-                                    //   // Ação a ser executada ao pressionar o Container
-                                    //   // print('Container pressionado!');
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -2684,10 +2652,12 @@ class _LibraryPageState extends State<LibraryPage> {
                                           color: Colors.black,
                                           img: data['imageUrl'] ??
                                               'unknown image',
-                                          songUrl: "assets/audio/gym.mp3",
+                                          songUrl: data['songUrl'] ??
+                                              'unknown songUrl',
                                         ),
                                       ),
                                     );
+                                    // songUrl : assets/audio/
                                   },
                                   child: Container(
                                     // color: Colors.yellow,
@@ -2733,17 +2703,37 @@ class _LibraryPageState extends State<LibraryPage> {
                                               top: 1.0,
                                               bottom: 0.0,
                                               right: 1.0),
-                                          child: Text(
-                                            data['description'] ?? '',
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w300,
-                                              color: Colors.grey,
-                                              // letterSpacing: -0.4,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              // Assuming you have a description and userId in the data map
+                                              String description =
+                                                  data['description'] ?? '';
+                                              String userId = data['userId'] ??
+                                                  ''; // Get the userId from data map
+
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ArtistPage(
+                                                    userId:
+                                                        userId, // Pass the userId as an argument to ArtistPage
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Text(
+                                              data['description'] ?? '',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w300,
+                                                color: Colors.grey,
+                                                // letterSpacing: -0.4,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              softWrap: false,
                                             ),
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 2,
-                                            softWrap: false,
                                           ),
                                         ),
                                       ],
@@ -3711,8 +3701,6 @@ class _MySearchLibraryState extends State<MySearchLibrary> {
   }
 }
 
-// / / / / / / / / / / / / / / / / / / / /
-
 class NewPlaylistPage extends StatefulWidget {
   const NewPlaylistPage({Key? key}) : super(key: key);
 
@@ -4091,7 +4079,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final marginHeight = MediaQuery.of(context).size.height * 0.3;
     String bio = userProfile['bio'] ?? '';
-    int followers = userProfile['followers'] ?? 0;
+    List<String> followers = userProfile['followers'] ?? [];
+    int nfollowers = followers.length;
     double rating = userProfile['rating'] ?? 0.0;
 
     bioController.text = bio;
@@ -4178,7 +4167,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Column(
                                     children: [
                                       Text(
-                                        followers.toString(),
+                                        nfollowers.toString(),
                                         style: const TextStyle(
                                           fontSize: 17,
                                           fontWeight: FontWeight.bold,
@@ -4515,6 +4504,442 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// / / / / / / / /
+
+class ArtistPage extends StatefulWidget {
+  final String userId; // userId to be used in the page
+
+  const ArtistPage({Key? key, required this.userId}) : super(key: key);
+
+  @override
+  _ArtistPageState createState() => _ArtistPageState();
+}
+
+class _ArtistPageState extends State<ArtistPage> {
+  // int counter = 0;
+  List<Map<String, dynamic>> myPlaylist = [];
+  Map<String, dynamic> userProfile = {};
+  bool isfollow = false;
+  TextEditingController bioController = TextEditingController();
+  String bio = '';
+  FocusNode bioFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    myPlaylist = [];
+    userProfile = {};
+    getmyplaylist();
+    getProfileInfo();
+
+    bioController.text = bio;
+    // setCursorAtEnd();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    bioController.dispose();
+    // Realize qualquer limpeza necessária aqui, como cancelar timers ou liberar recursos
+  }
+
+  void getmyplaylist() {
+    // Adicionar informacoes as musicas
+    // if (mounted) {
+    // AuthService().uploadMusic(
+    //   " title 1",
+    //   "assets/images/cover.jpg",
+    //   "ruben descrition",
+    //   5,
+    // );
+    // AuthService().getPlaylist().then((value) {  //HERE
+    //   print(value);
+    // });
+    AuthService().getPlaylist().then((value) {
+      if (mounted) {
+        setState(() {
+          myPlaylist = value;
+        });
+      }
+    });
+  }
+
+  void setCursorAtEnd() {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      if (bioController.text.isNotEmpty) {
+        bioController.selection = TextSelection.fromPosition(
+          TextPosition(offset: bioController.text.length),
+        );
+      }
+    });
+  }
+
+  void getProfileInfo() {
+    AuthService().getUserProfile().then((value) {
+      if (mounted) {
+        setState(() {
+          userProfile = value;
+          // bio = userProfile['bio'];
+          // bioController.text = bio;
+        });
+      }
+      // if (mounted) {
+      //   setState(() {
+      //     userProfile = value;
+      //     // Atualizar o valor do TextField
+      //   });
+      // }
+    });
+  }
+
+  String getButtonText() {
+    return isfollow ? 'Unfollow' : 'Follow';
+  }
+
+  Widget build(BuildContext context) {
+    AuthService().getPlaylist().then((value) {
+      if (mounted) {
+        setState(() {
+          myPlaylist = value;
+        });
+      }
+    });
+
+    final marginHeight = MediaQuery.of(context).size.height * 0.3;
+    String bio = userProfile['bio'] ?? '';
+    int followers = userProfile['followers'].length ?? 0;
+    double rating = userProfile['rating'] ?? 0.0;
+
+    bioController.text = bio;
+
+    bioController.selection = TextSelection.fromPosition(
+        TextPosition(offset: bioController.text.length));
+
+    return Scaffold(
+      body: Container(
+        child: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/1.jpg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: marginHeight),
+              child: Container(
+                // margin: EdgeInsets.only(top: marginHeight),
+                color: Colors.white.withOpacity(0.7),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          // color: Colors.amber.withOpacity(0.9),
+                          width: 70,
+                          padding: const EdgeInsets.only(
+                              left: 0, top: 5, bottom: 0, right: 0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    AuthService().getProfileImage() ?? ''),
+                                radius: 30,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                AuthService().getUserName() ?? '',
+                                // getFirstName(),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  // fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          // color: Colors.blue.withOpacity(0.9),
+                          // width: 90,
+                          padding: const EdgeInsets.only(
+                              left: 10, top: 5, bottom: 0, right: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(
+                                        followers.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      // const SizedBox(height: 1),
+                                      const Text(
+                                        'followers',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          // fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Column(
+                                    children: [
+                                      Text(
+                                        rating.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      // const SizedBox(height: 1),
+                                      const Text(
+                                        'rating',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          // fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 30),
+                                  Column(
+                                    children: [
+                                      ElevatedButton(
+                                        // onPressed:
+                                        // isEditing ? saveChanges : () {},
+                                        onPressed: () {
+                                          // setState(() {
+                                          // isEditing = !isEditing;
+                                          // if (isEditing) {
+                                          //   FocusScope.of(context)
+                                          //       .requestFocus(bioFocusNode);
+                                          // }
+                                          if (isfollow) {
+                                            // String newBio = bioController.text;
+                                            // AuthService().updateBio(newBio);
+
+                                            if (mounted) {
+                                              setState(() {
+                                                // bio = newBio;
+                                                isfollow = false;
+                                              });
+                                            }
+                                            AuthService()
+                                                .addCurrentUserIdToFollowersList(
+                                                    widget.userId);
+                                          } else {
+                                            if (mounted) {
+                                              setState(() {
+                                                isfollow = true;
+                                              });
+                                            }
+
+                                            AuthService()
+                                                .addCurrentUserIdToFollowersList(
+                                                    widget
+                                                        .userId); // FocusScope.of(context)
+
+                                            // FocusScope.of(context)
+                                            //     .requestFocus(bioFocusNode);
+                                          }
+                                          // }
+                                          // );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors
+                                              .transparent, // Não é mais necessário, utilize o backgroundColor
+                                          onPrimary: Colors
+                                              .black, // Define a cor do texto
+                                          side: const BorderSide(
+                                              color: Colors.black,
+                                              width:
+                                                  1.0), // Adiciona uma borda preta
+                                          elevation: 0, // Remove a sombra
+                                        ),
+                                        child: Text(
+                                          getButtonText(),
+                                          style: const TextStyle(
+                                            fontSize:
+                                                13, // Diminui o tamanho do texto
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              // const SizedBox(height: 3),
+                              Row(
+                                // descricao
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    bio,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      // fontWeight: FontWeight.bold,
+                                    ),
+                                    softWrap: true,
+                                    maxLines:
+                                        2, // Define o número máximo de linhas
+                                    overflow: TextOverflow
+                                        .ellipsis, // Adiciona "..." quando o texto é muito longo
+                                    textAlign: TextAlign
+                                        .center, // Centraliza o texto horizontalmente
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Visibility(
+                      visible: myPlaylist.isNotEmpty,
+                      child: Expanded(
+                        child: Container(
+                          // color: Colors.blue,
+                          child: ListView(
+                            padding: const EdgeInsets.only(
+                              left: 5,
+                              right: 5,
+                              top: 0,
+                              bottom: 0,
+                            ),
+                            children: [
+                              GridView.builder(
+                                shrinkWrap: true,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 5,
+                                  mainAxisSpacing: 5,
+                                  mainAxisExtent: 150,
+                                ),
+                                itemCount: myPlaylist.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final data = myPlaylist[index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // myPlaylist
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) => MusicDetailPage(
+                                      //       musicID: data['id'],
+                                      //       title: data['title'],
+                                      //       description: data['description'],
+                                      //       color: Colors.black,
+                                      //       img: data['imageUrl'],
+                                      //       songUrl: "assets/audio/gym.mp3",
+                                      //     ),
+                                      //   ),
+                                      // );
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MusicDetailPage(
+                                            musicID:
+                                                data['musicId'] ?? 'unknown id',
+                                            title: data['title'] ??
+                                                'unknown title',
+                                            description: data['description'] ??
+                                                'unknown description',
+                                            color: Colors.black,
+                                            img: data['imageUrl'] ??
+                                                'unknown image',
+                                            songUrl: "assets/audio/gym.mp3",
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      child: Column(
+                                        children: [
+                                          ClipRect(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: Image.asset(
+                                                data['imageUrl'],
+                                                fit: BoxFit.cover,
+                                                height: 100,
+                                                width: 100,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 0.0,
+                                              top: 2.0,
+                                              bottom: 1.0,
+                                              right: 1.0,
+                                            ),
+                                            child: Text(
+                                              data['title'],
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              softWrap: false,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 0.0,
+                                              top: 2.0,
+                                              bottom: 1.0,
+                                              right: 1.0,
+                                            ),
+                                            child: Text(
+                                              data['description'],
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              softWrap: false,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

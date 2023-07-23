@@ -1,4 +1,7 @@
 // import 'package:artify/screens/search_page.dart';
+import 'package:artify/firebase_options.dart';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:artify/services/services.dart';
 import 'package:flutter/material.dart';
 // import 'dart:io';
@@ -16,11 +19,20 @@ import 'package:just_audio/just_audio.dart';
 // import 'package:flutter_icons/flutter_icons.dart';
 // import 'package:spotify_clone/theme/colors.dart';
 import 'package:firebase_core/firebase_core.dart';
+// import 'package:dcdg/dcdg.dart';
+
 // import 'package:audioplayers/audioplayers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+
+  FirebaseMessaging.instance.getToken().then((token) {
+    // O token será retornado aqui após a inicialização bem-sucedida
+    print('FCM Token: $token');
+  });
+
   runApp(MyApp());
 }
 
