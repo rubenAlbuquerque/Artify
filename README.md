@@ -2,11 +2,6 @@
 Projeto da cadeira de aplicacoes multimedia interativa (AMI) do mestrado
 
 
-! [Alt text](https://github.com/rubenAlbuquerque/Artify/blob/main/images/1.jpg)
-
-
-
-
 <!-- Grid de imagens em 3 colunas -->
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
     <img src="https://github.com/rubenAlbuquerque/Artify/blob/main/images/1.jpg" alt="Imagem 1" width="200" >
